@@ -2,243 +2,207 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Truck, ShieldCheck, MessageCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Heart } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { getFeaturedProducts, mockProducts } from '@/lib/mockData';
-
-const categories = [
-  { name: 'Silk', emoji: '✨', description: 'Luxurious silk weaves', count: mockProducts.filter(p => p.fabric === 'Silk' || p.fabric === 'Tussar Silk').length },
-  { name: 'Cotton', emoji: '🌿', description: 'Breezy cotton comfort', count: mockProducts.filter(p => p.fabric === 'Cotton').length },
-  { name: 'Georgette', emoji: '🌸', description: 'Flowing elegance', count: mockProducts.filter(p => p.fabric === 'Georgette').length },
-  { name: 'Linen', emoji: '🍃', description: 'Eco-chic drapes', count: mockProducts.filter(p => p.fabric === 'Linen').length },
-  { name: 'Crepe', emoji: '🎭', description: 'Royal textures', count: mockProducts.filter(p => p.fabric === 'Crepe').length },
-  { name: 'Wedding', emoji: '💍', description: 'Bridal collection', count: mockProducts.filter(p => p.occasion === 'Wedding').length },
-];
-
-const features = [
-  { icon: Sparkles, title: 'Handpicked Quality', description: 'Every saree is carefully selected from master weavers' },
-  { icon: Truck, title: 'Pan-India Delivery', description: 'Free shipping on orders above ₹5,000' },
-  { icon: ShieldCheck, title: 'Authenticity Guaranteed', description: '100% genuine handloom products' },
-  { icon: MessageCircle, title: 'WhatsApp Ordering', description: 'Easy checkout via WhatsApp chat' },
-];
+import { categoriesData, mockProducts } from '@/lib/mockData';
+import { SectionDivider, RoyalElephant, FestiveEmblemBadge } from '@/components/OrnamentalIcons';
 
 export default function HomePage() {
-  const featured = getFeaturedProducts();
+  const featured = mockProducts;
 
   return (
-    <div className="page-enter">
-      {/* Hero Section */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-bg)] via-[#1a1510] to-[var(--color-bg)]" />
-          <div className="absolute top-1/4 -right-32 w-96 h-96 bg-[var(--color-gold)]/5 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 -left-32 w-80 h-80 bg-[var(--color-gold)]/5 rounded-full blur-3xl" />
-          {/* Decorative pattern */}
-          <div className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a853' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
+    <div className="bg-[#FAF6EE] text-[#241416] font-serif">
+      {/* 1. Hero Carousel / Banner Section */}
+      <section className="relative min-h-[88vh] flex items-center justify-center overflow-hidden bg-[#38030B]">
+        {/* Background Image with Dark Vignette */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1920&q=85"
+            alt="Royal Heritage Sarees"
+            className="w-full h-full object-cover object-center opacity-60"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#38030B]/90 via-[#38030B]/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#38030B] via-transparent to-[#38030B]/70" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-3xl">
+        {/* Jharokha Arch Overlay Border */}
+        <div className="absolute inset-4 sm:inset-8 border border-[#C59B27]/40 pointer-events-none rounded-xl z-10 flex flex-col justify-between p-4">
+          <div className="flex justify-between text-[#C59B27] text-sm">
+            <span>❖</span>
+            <span>❖</span>
+          </div>
+          <div className="flex justify-between text-[#C59B27] text-sm">
+            <span>❖</span>
+            <span>❖</span>
+          </div>
+        </div>
+
+        {/* Hero Content Container */}
+        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-12 py-24 w-full flex flex-col md:flex-row items-center justify-between gap-12">
+          {/* Left Text Column */}
+          <div className="max-w-2xl text-left">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20 mb-6">
-                <Sparkles className="w-3.5 h-3.5" />
-                Handcrafted with Love
-              </span>
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.15] text-[#FAF6EE] mb-6">
+                Grace in every drape. <br />
+                <span className="text-[#E8C86B] italic font-normal">Tradition in every thread.</span>
+              </h1>
             </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6"
-            >
-              <span className="text-[var(--color-cream)]">Timeless</span>
-              <br />
-              <span className="text-gradient-gold">Indian Sarees</span>
-              <br />
-              <span className="text-[var(--color-cream)]">Woven for You</span>
-            </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="font-body text-lg sm:text-xl text-[var(--color-text-muted)] max-w-xl mb-8 leading-relaxed"
+              className="text-base sm:text-lg text-[#EBE2D0] max-w-lg mb-8 font-sans font-light leading-relaxed"
             >
-              Explore our curated collection of handloom sarees from
-              India&apos;s finest weaving traditions — from Kanjivaram silks to
-              Chanderi cottons.
+              Discover the finest curated collection of handloom sarees that celebrate your heritage, elegance, and timeless grace.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="flex flex-wrap gap-4"
             >
-              <Link href="/shop" className="btn-gold inline-flex items-center gap-2 text-base">
-                Explore Collection
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link href="/about" className="btn-outline inline-flex items-center gap-2 text-base">
-                Our Story
+              <Link
+                href="/shop"
+                className="btn-maroon-gold inline-flex items-center gap-3 text-sm tracking-widest font-semibold px-8 py-3.5 rounded-full uppercase"
+              >
+                SHOP NOW
+                <ArrowRight className="w-4 h-4 text-[#E8C86B]" />
               </Link>
             </motion.div>
           </div>
+
+          {/* Right Emblem Badge (Festive Badge floating emblem) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="hidden md:block"
+          >
+            <FestiveEmblemBadge text="FESTIVE COLLECTION '24" />
+          </motion.div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 border-y border-[var(--color-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {features.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="text-center space-y-3"
-              >
-                <div className="w-12 h-12 rounded-xl bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 flex items-center justify-center mx-auto">
-                  <feature.icon className="w-5 h-5 text-[var(--color-gold)]" />
+      {/* 2. Category Explorer Section ("EXPLORE CATEGORIES") */}
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <SectionDivider title="EXPLORE CATEGORIES" />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-6 justify-items-center mt-10">
+          {categoriesData.map((cat, i) => (
+            <motion.div
+              key={cat.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+              className="flex flex-col items-center text-center group cursor-pointer"
+            >
+              <Link href={`/shop?category=${cat.slug}`} className="flex flex-col items-center">
+                {/* Circular Gold Filigree Ring */}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-[#C59B27] via-[#E8C86B] to-[#997517] shadow-md group-hover:scale-105 transition-transform duration-300 relative">
+                  <div className="w-full h-full rounded-full overflow-hidden border-2 border-[#FAF6EE] relative bg-[#F3EDE0]">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    {cat.badge && (
+                      <div className="absolute inset-0 bg-[#6A091A]/80 flex items-center justify-center p-1 text-center">
+                        <span className="text-[10px] font-bold text-[#E8C86B] tracking-wider leading-tight">
+                          {cat.badge}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <h3 className="font-display text-sm font-semibold text-[var(--color-cream)]">
-                  {feature.title}
-                </h3>
-                <p className="text-xs text-[var(--color-text-dim)] leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
+
+                {/* Category Label */}
+                <span className="mt-3 text-xs sm:text-sm font-semibold tracking-wider text-[#6A091A] uppercase group-hover:text-[#C59B27] transition-colors">
+                  {cat.name}
+                </span>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-cream)] mb-3"
-            >
-              Featured <span className="text-gradient-gold">Sarees</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-[var(--color-text-muted)] max-w-lg mx-auto"
-            >
-              Hand-selected pieces from our latest collection
-            </motion.p>
-            <div className="divider-gold max-w-xs mx-auto mt-6" />
+      {/* 3. Festive Promotional Banner ("WEDDING SEASON SPECIAL") */}
+      <section className="my-16 bg-[#4A0512] border-y-2 border-[#C59B27] py-12 px-6 relative overflow-hidden text-[#E8C86B]">
+        {/* Damask Pattern Glow */}
+        <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#E8C86B_1px,transparent_1px)] [background-size:24px_24px]" />
+
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 relative z-10 text-center md:text-left">
+          {/* Left Royal Elephant */}
+          <div className="hidden lg:block opacity-90 hover:scale-105 transition-transform">
+            <RoyalElephant className="w-36 h-28" />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featured.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {/* Center Text Offer */}
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs sm:text-sm font-serif tracking-[0.3em] text-[#E8C86B] uppercase border-y border-[#C59B27]/40 py-1 px-4">
+              ❖ WEDDING SEASON SPECIAL ❖
+            </span>
 
-          <div className="text-center mt-12">
-            <Link href="/shop" className="btn-outline inline-flex items-center gap-2">
-              View All Sarees
-              <ArrowRight className="w-4 h-4" />
+            <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-wider text-[#FFFDF8] uppercase leading-tight">
+              UPTO 30% OFF
+            </h2>
+
+            <p className="font-serif text-sm tracking-[0.2em] text-[#E8C86B] uppercase">
+              ON SELECTED COLLECTIONS
+            </p>
+
+            <Link
+              href="/shop"
+              className="mt-4 btn-gold-outline text-xs tracking-widest px-8 py-2.5 rounded-full font-bold bg-[#6A091A] text-[#E8C86B] border-[#E8C86B] hover:bg-[#E8C86B] hover:text-[#4A0512]"
+            >
+              SHOP THE LOOK
             </Link>
           </div>
-        </div>
-      </section>
 
-      {/* Browse by Category */}
-      <section className="py-20 bg-[var(--color-surface)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-cream)] mb-3"
-            >
-              Browse by <span className="text-gradient-gold">Category</span>
-            </motion.h2>
-            <div className="divider-gold max-w-xs mx-auto mt-6" />
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((cat, i) => (
-              <motion.div
-                key={cat.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-              >
-                <Link
-                  href="/shop"
-                  className="block p-5 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[var(--color-gold)]/30 card-hover text-center group"
-                >
-                  <span className="text-3xl block mb-3">{cat.emoji}</span>
-                  <h3 className="font-display text-sm font-semibold text-[var(--color-cream)] group-hover:text-[var(--color-gold)] transition-colors">
-                    {cat.name}
-                  </h3>
-                  <p className="text-[10px] text-[var(--color-text-dim)] mt-1">
-                    {cat.description}
-                  </p>
-                  <span className="text-[10px] text-[var(--color-gold)] mt-2 block">
-                    {cat.count} items
-                  </span>
-                </Link>
-              </motion.div>
-            ))}
+          {/* Right Royal Elephant (Mirrored) */}
+          <div className="hidden lg:block opacity-90 transform -scale-x-100 hover:scale-x-[-1.05] hover:scale-y-[1.05] transition-transform">
+            <RoyalElephant className="w-36 h-28" />
           </div>
         </div>
       </section>
 
-      {/* CTA Banner */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl p-10 sm:p-16 text-center"
-            style={{
-              background: 'linear-gradient(135deg, rgba(212,168,83,0.15), rgba(28,25,23,0.9), rgba(212,168,83,0.1))',
-              border: '1px solid rgba(212,168,83,0.2)',
-            }}
+      {/* 4. New Arrivals Grid ("NEW ARRIVALS") */}
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <SectionDivider title="NEW ARRIVALS" />
+
+        {/* 5-Column Product Layout matching reference image */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5 mt-10">
+          {featured.slice(0, 5).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+
+        {/* View All Collections Button */}
+        <div className="text-center mt-12">
+          <Link
+            href="/shop"
+            className="btn-maroon-gold inline-flex items-center gap-2 text-xs tracking-widest font-bold px-10 py-3.5 rounded-full uppercase"
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--color-gold)]/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[var(--color-gold)]/5 rounded-full blur-3xl" />
-            <div className="relative">
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-cream)] mb-4">
-                Order via <span className="text-gradient-gold">WhatsApp</span>
-              </h2>
-              <p className="text-[var(--color-text-muted)] max-w-lg mx-auto mb-8">
-                Simply add sarees to your bag, and checkout instantly via WhatsApp.
-                We&apos;ll confirm your order and arrange delivery — no complex
-                payment gateways needed.
-              </p>
-              <Link href="/shop" className="btn-gold inline-flex items-center gap-2 text-base">
-                <MessageCircle className="w-4 h-4" />
-                Start Shopping
-              </Link>
-            </div>
-          </motion.div>
+            VIEW ALL COLLECTIONS
+          </Link>
+        </div>
+      </section>
+
+      {/* 5. Heritage Craftsmanship Story Section */}
+      <section className="py-16 bg-[#F3EDE0] border-t border-[#C59B27]/40 px-6">
+        <div className="max-w-5xl mx-auto text-center space-y-4">
+          <span className="text-xs font-serif tracking-[0.3em] text-[#C59B27] uppercase">❖ HERITAGE & HANDLOOM ❖</span>
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#6A091A]">
+            Crafted by Master Weavers Across India
+          </h2>
+          <p className="font-sans text-sm sm:text-base text-[#7C6354] leading-relaxed max-w-2xl mx-auto">
+            From the sacred looms of Varanasi to the heritage temples of Kanchipuram, every saree in our boutique is ethically sourced and woven with authentic gold zari threads.
+          </p>
         </div>
       </section>
     </div>

@@ -1,31 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #0c0a09;
-  --color-bg-card: #1c1917;
-  --color-bg-elevated: #292524;
-  --color-surface: #1a1814;
-  --color-gold: #d4a853;
-  --color-gold-light: #e8c97a;
-  --color-gold-dark: #b8922f;
-  --color-cream: #fef3e2;
-  --color-cream-muted: #f5e6d3;
-  --color-text: #fafaf9;
-  --color-text-muted: #a8a29e;
-  --color-text-dim: #78716c;
-  --color-border: #44403c;
-  --color-border-light: #57534e;
-  --color-accent: #dc2626;
-  --color-success: #16a34a;
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'Outfit', system-ui, sans-serif;
+  --color-bg: #FAF6EE;
+  --color-bg-alt: #F3EDE0;
+  --color-bg-card: #FFFDF8;
+  --color-bg-elevated: #F6EFE2;
+  
+  --color-maroon: #6A091A;
+  --color-maroon-dark: #4A0512;
+  --color-maroon-light: #841026;
+  --color-maroon-deep: #38030B;
+
+  --color-gold: #C59B27;
+  --color-gold-light: #E8C86B;
+  --color-gold-dark: #997517;
+  
+  --color-sandalwood: #8C6B4F;
+  --color-emerald: #0D3B2E;
+  
+  --color-text: #241416;
+  --color-text-muted: #8C6B4F;
+
+  --color-border-gold: #C59B27;
+  --color-border-subtle: #E2D7C3;
+
+  --font-playfair: var(--font-playfair), 'Playfair Display', Georgia, serif;
+  --font-cormorant: var(--font-cormorant), 'Cormorant Garamond', Georgia, serif;
+  --font-body: var(--font-outfit), 'Outfit', system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--color-bg);
   --color-foreground: var(--color-text);
   --font-sans: var(--font-body);
-  --font-serif: var(--font-display);
+  --font-serif: var(--font-cormorant);
 }
 
 * {
@@ -33,184 +41,105 @@
 }
 
 body {
-  background: var(--color-bg);
+  background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
   overflow-x: hidden;
 }
 
-/* Scrollbar Styling */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: var(--color-bg-alt);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
+  background: var(--color-gold);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gold-dark);
+  background: var(--color-maroon);
 }
 
-/* Selection */
 ::selection {
-  background: var(--color-gold);
-  color: var(--color-bg);
+  background: var(--color-maroon);
+  color: var(--color-gold-light);
 }
 
-/* Utilities */
-.font-display {
-  font-family: var(--font-display);
+/* Typography Utilities */
+.font-cormorant {
+  font-family: var(--font-cormorant);
 }
 
-.font-body {
+.font-playfair {
+  font-family: var(--font-playfair);
+}
+
+.font-sans {
   font-family: var(--font-body);
 }
 
-.text-gold {
+/* Metallic Gold Accent Text */
+.text-gold-accent {
   color: var(--color-gold);
 }
 
-.bg-gold {
-  background-color: var(--color-gold);
+.text-maroon-royal {
+  color: var(--color-maroon);
 }
 
-.border-gold {
-  border-color: var(--color-gold);
+/* Section Framing & Gold Borders (Rule: Borders read Indian-ornate, not drop shadows) */
+.border-gold-trim {
+  border: 1px solid rgba(197, 155, 39, 0.4);
 }
 
-/* Glass effect */
-.glass {
-  background: rgba(28, 25, 23, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 168, 83, 0.15);
+.border-gold-trim-strong {
+  border: 1px solid rgba(197, 155, 39, 0.8);
 }
 
-/* Shimmer animation for loading states */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--color-bg-card) 25%,
-    var(--color-bg-elevated) 50%,
-    var(--color-bg-card) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-/* Gold gradient text */
-.text-gradient-gold {
-  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold), var(--color-gold-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Hover card lift */
-.card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(212, 168, 83, 0.1);
-}
-
-/* Button styles */
-.btn-gold {
-  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark));
-  color: var(--color-bg);
-  font-weight: 600;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
+/* Buttons (Rule: Gold is trim, not fill) */
+.btn-maroon-gold {
+  background: #6A091A;
+  color: #FAF6EE;
+  border: 1.5px solid #C59B27;
   font-family: var(--font-body);
-}
-.btn-gold:hover {
-  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(212, 168, 83, 0.3);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all 0.3s ease;
 }
 
-.btn-outline {
+.btn-maroon-gold:hover {
+  background: #4A0512;
+  color: #E8C86B;
+  border-color: #E8C86B;
+  box-shadow: 0 4px 15px rgba(106, 9, 26, 0.3);
+}
+
+.btn-gold-outline {
   background: transparent;
-  color: var(--color-gold);
-  font-weight: 500;
-  padding: 0.75rem 2rem;
-  border-radius: 0.5rem;
-  border: 1.5px solid var(--color-gold);
-  transition: all 0.3s ease;
-  cursor: pointer;
+  color: #6A091A;
+  border: 1.5px solid #C59B27;
   font-family: var(--font-body);
-}
-.btn-outline:hover {
-  background: var(--color-gold);
-  color: var(--color-bg);
-  transform: translateY(-2px);
-}
-
-/* Image zoom container */
-.img-zoom-container {
-  overflow: hidden;
-  border-radius: 0.75rem;
-}
-.img-zoom-container img {
-  transition: transform 0.6s ease;
-}
-.img-zoom-container:hover img {
-  transform: scale(1.08);
-}
-
-/* Page transitions */
-.page-enter {
-  animation: fadeInUp 0.5s ease forwards;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Tag / chip styles */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
   font-weight: 500;
-  background: var(--color-bg-elevated);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  transition: all 0.2s ease;
-}
-.chip:hover {
-  border-color: var(--color-gold);
-  color: var(--color-gold);
-}
-.chip.active {
-  background: var(--color-gold);
-  color: var(--color-bg);
-  border-color: var(--color-gold);
+  transition: all 0.3s ease;
 }
 
-/* Divider */
-.divider-gold {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+.btn-gold-outline:hover {
+  background: #6A091A;
+  color: #FAF6EE;
+  border-color: #C59B27;
+}
+
+/* Card Hover Effects (Rule: Scale 1.02-1.03 + gold border intensifies) */
+.parchment-card {
+  background: #FFFDF8;
+  border: 1px solid rgba(197, 155, 39, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.parchment-card:hover {
+  border-color: rgba(197, 155, 39, 0.8);
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(106, 9, 26, 0.06);
 }

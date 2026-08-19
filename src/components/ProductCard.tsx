@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Check } from 'lucide-react';
+import { ShoppingBag, Check, Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useCartStore } from '@/store/cartStore';
 import { Product } from '@/lib/supabase';
@@ -13,6 +13,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [added, setAdded] = useState(false);
+  const [liked, setLiked] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -30,89 +31,73 @@ export default function ProductCard({ product }: ProductCardProps) {
     setTimeout(() => setAdded(false), 1500);
   };
 
-  const discount = product.mrp
-    ? Math.round(((product.mrp - product.price) / product.mrp) * 100)
-    : 0;
+  const handleToggleLike = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLiked(!liked);
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className="group block"
     >
-      <Link href={`/product/${product.slug}`} className="group block">
-        <div className="card-hover rounded-2xl overflow-hidden bg-[var(--color-bg-card)] border border-[var(--color-border)] transition-all duration-300 hover:border-[var(--color-gold)]/30">
-          {/* Image */}
-          <div className="relative aspect-[3/4] overflow-hidden bg-[var(--color-bg-elevated)]">
-            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-gold-dark)]/10 via-[var(--color-bg-elevated)] to-[var(--color-bg-card)] flex items-center justify-center">
-              <span className="text-6xl opacity-60 group-hover:scale-110 transition-transform duration-500">
-                🥻
-              </span>
-            </div>
+      <Link href={`/product/${product.slug}`}>
+        <div className="bg-[#FFFDF8] border border-[#E2D7C3] hover:border-[#C59B27] rounded-lg p-2.5 transition-all duration-300 shadow-xs hover:shadow-lg">
+          {/* Image Frame */}
+          <div className="relative aspect-[3/4] overflow-hidden rounded bg-[#F3EDE0] border border-[#C59B27]/20">
+            <img
+              src={product.images[0] || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80'}
+              alt={product.name}
+              className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+            />
 
-            {/* Badges */}
-            <div className="absolute top-3 left-3 flex flex-col gap-2">
-              {product.featured && (
-                <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-semibold bg-[var(--color-gold)] text-[var(--color-bg)]">
-                  Featured
-                </span>
-              )}
-              {discount > 0 && (
-                <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-semibold bg-red-600 text-white">
-                  {discount}% Off
-                </span>
-              )}
-              {!product.in_stock && (
-                <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-semibold bg-[var(--color-bg)]/80 text-[var(--color-text-muted)] border border-[var(--color-border)]">
-                  Sold Out
-                </span>
-              )}
-            </div>
+            {/* Wishlist Heart Icon (Reference image inspired) */}
+            <button
+              onClick={handleToggleLike}
+              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-[#FAF6EE]/80 backdrop-blur-xs flex items-center justify-center text-[#6A091A] hover:bg-[#6A091A] hover:text-[#E8C86B] transition-colors z-10 shadow-xs"
+              aria-label="Add to wishlist"
+            >
+              <Heart className={`w-4 h-4 ${liked ? 'fill-[#6A091A] text-[#6A091A]' : ''}`} />
+            </button>
 
-            {/* Add to cart overlay */}
-            {product.in_stock && (
-              <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={added}
-                  className={`w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
-                    added
-                      ? 'bg-green-600 text-white'
-                      : 'bg-[var(--color-gold)] text-[var(--color-bg)] hover:bg-[var(--color-gold-light)]'
-                  }`}
-                >
-                  {added ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Added!
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag className="w-4 h-4" />
-                      Add to Bag
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
+            {/* Quick Add overlay */}
+            <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-[#6A091A]/80 via-[#6A091A]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <button
+                onClick={handleAddToCart}
+                disabled={added}
+                className="btn-maroon-gold text-xs py-1.5 px-4 rounded-full w-full font-serif font-medium flex items-center justify-center gap-1.5"
+              >
+                {added ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    ADDED TO BAG
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-3.5 h-3.5" />
+                    QUICK ADD
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Info */}
-          <div className="p-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="chip text-[10px]">{product.fabric}</span>
-              <span className="chip text-[10px]">{product.occasion}</span>
-            </div>
-            <h3 className="font-display text-base font-semibold text-[var(--color-cream)] truncate group-hover:text-[var(--color-gold)] transition-colors duration-200">
+          {/* Product Details (Ref image alignment: title + price centered/left) */}
+          <div className="pt-3 pb-1 px-1 text-center">
+            <h3 className="font-serif font-medium text-sm sm:text-base text-[#241416] group-hover:text-[#6A091A] transition-colors truncate">
               {product.name}
             </h3>
-            <div className="flex items-center gap-2">
-              <span className="font-body font-bold text-lg text-[var(--color-gold)]">
+
+            <div className="flex items-center justify-center gap-2 mt-1 font-serif">
+              <span className="text-[#6A091A] font-bold text-sm sm:text-base">
                 ₹{product.price.toLocaleString('en-IN')}
               </span>
               {product.mrp && product.mrp > product.price && (
-                <span className="text-sm text-[var(--color-text-dim)] line-through">
+                <span className="text-xs text-[#7C6354] line-through">
                   ₹{product.mrp.toLocaleString('en-IN')}
                 </span>
               )}

@@ -1,22 +1,75 @@
 import { Product } from './supabase';
 
-// Mock product data used when Supabase is not configured yet
+export interface CategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  badge?: string;
+}
+
+export const categoriesData: CategoryItem[] = [
+  {
+    id: '1',
+    name: 'SILK SAREES',
+    slug: 'silk-sarees',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: '2',
+    name: 'BANARASI',
+    slug: 'banarasi',
+    image: 'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: '3',
+    name: 'KANCHIPURAM',
+    slug: 'kanchipuram',
+    image: 'https://images.unsplash.com/photo-1610030469668-9861616c68b7?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: '4',
+    name: 'COTTON SAREES',
+    slug: 'cotton-sarees',
+    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: '5',
+    name: 'CHIFFON',
+    slug: 'chiffon',
+    image: 'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: '6',
+    name: 'LEHENGAS',
+    slug: 'lehengas',
+    image: 'https://images.unsplash.com/photo-1594465919760-441fe5908ab0?auto=format&fit=crop&w=600&q=80',
+  },
+  {
+    id: '7',
+    name: 'SALE',
+    slug: 'sale',
+    badge: 'UPTO 50% OFF',
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80',
+  },
+];
+
 export const mockProducts: Product[] = [
   {
     id: '1',
-    name: 'Royal Kanjivaram Silk',
-    slug: 'royal-kanjivaram-silk',
-    price: 12999,
-    mrp: 18999,
-    fabric: 'Silk',
-    color: 'Red',
-    occasion: 'Wedding',
-    region: 'Tamil Nadu',
+    name: 'Royal Banarasi Silk Saree',
+    slug: 'royal-banarasi-silk-saree',
+    price: 3499,
+    mrp: 5999,
+    fabric: 'Pure Silk',
+    color: 'Red & Gold',
+    occasion: 'Wedding & Festive',
+    region: 'Varanasi',
     description:
-      'A magnificent Kanjivaram silk saree handwoven by master artisans of Tamil Nadu. Features intricate zari work with traditional temple border design. This timeless piece is perfect for weddings and grand celebrations.',
+      'Opulent Royal Banarasi silk saree woven with golden zari brocade motifs across rich crimson red silk. Complete with traditional intricate border.',
     images: [
-      '/images/saree-1.jpg',
-      '/images/saree-1b.jpg',
+      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
     ],
     in_stock: true,
     featured: true,
@@ -24,19 +77,19 @@ export const mockProducts: Product[] = [
   },
   {
     id: '2',
-    name: 'Banarasi Brocade Elegance',
-    slug: 'banarasi-brocade-elegance',
-    price: 9499,
-    mrp: 14999,
-    fabric: 'Silk',
-    color: 'Gold',
+    name: 'Mehendi Green Kanjivaram Saree',
+    slug: 'mehendi-green-kanjivaram-saree',
+    price: 4299,
+    mrp: 6999,
+    fabric: 'Kanjivaram Silk',
+    color: 'Mehendi Green',
     occasion: 'Wedding',
-    region: 'Varanasi',
+    region: 'Kanchipuram',
     description:
-      'An exquisite Banarasi brocade saree featuring opulent gold zari weaving on luxurious silk. Each thread tells a story of centuries-old craftsmanship from the looms of Varanasi.',
+      'Authentic Kanchipuram silk saree in mehendi green featuring contrasting crimson pallu and heavy gold thread weaving.',
     images: [
-      '/images/saree-2.jpg',
-      '/images/saree-2b.jpg',
+      'https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1610030469668-9861616c68b7?auto=format&fit=crop&w=800&q=80',
     ],
     in_stock: true,
     featured: true,
@@ -44,39 +97,39 @@ export const mockProducts: Product[] = [
   },
   {
     id: '3',
-    name: 'Chanderi Cotton Breeze',
-    slug: 'chanderi-cotton-breeze',
-    price: 3499,
-    mrp: 5999,
-    fabric: 'Cotton',
-    color: 'Blue',
-    occasion: 'Casual',
-    region: 'Madhya Pradesh',
+    name: 'Peach Gold Tissue Saree',
+    slug: 'peach-gold-tissue-saree',
+    price: 2699,
+    mrp: 4499,
+    fabric: 'Tissue Silk',
+    color: 'Peach Gold',
+    occasion: 'Festive',
+    region: 'Chanderi',
     description:
-      'A lightweight Chanderi cotton saree with delicate hand-block prints. Perfect for daily elegance and casual gatherings. The sheer texture and golden border add a touch of sophistication.',
+      'Luminous peach gold tissue silk saree with shimmering golden sheen and delicate hand-carved golden pallu flourishes.',
     images: [
-      '/images/saree-3.jpg',
-      '/images/saree-3b.jpg',
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=800&q=80',
     ],
     in_stock: true,
-    featured: false,
+    featured: true,
     created_at: new Date().toISOString(),
   },
   {
     id: '4',
-    name: 'Mysore Crepe Royale',
-    slug: 'mysore-crepe-royale',
-    price: 6999,
-    mrp: 9999,
-    fabric: 'Crepe',
-    color: 'Purple',
-    occasion: 'Festival',
-    region: 'Karnataka',
+    name: 'Navy Blue Woven Saree',
+    slug: 'navy-blue-woven-saree',
+    price: 3199,
+    mrp: 4999,
+    fabric: 'Pure Woven Silk',
+    color: 'Navy Blue',
+    occasion: 'Reception',
+    region: 'Bengal',
     description:
-      'A luxurious Mysore crepe silk saree in regal purple with a contrast pallu featuring traditional Mysore motifs. Ideal for festive occasions and temple visits.',
+      'Regal navy blue woven saree adorned with antique silver-gold zari booti work and opulent royal temple pallu.',
     images: [
-      '/images/saree-4.jpg',
-      '/images/saree-4b.jpg',
+      'https://images.unsplash.com/photo-1610030469668-9861616c68b7?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1594465919760-441fe5908ab0?auto=format&fit=crop&w=800&q=80',
     ],
     in_stock: true,
     featured: true,
@@ -84,79 +137,19 @@ export const mockProducts: Product[] = [
   },
   {
     id: '5',
-    name: 'Tussar Silk Heritage',
-    slug: 'tussar-silk-heritage',
-    price: 7999,
-    mrp: 11999,
-    fabric: 'Tussar Silk',
-    color: 'Beige',
-    occasion: 'Festival',
-    region: 'Bihar',
+    name: 'Rose Pink Organza Saree',
+    slug: 'rose-pink-organza-saree',
+    price: 2499,
+    mrp: 3999,
+    fabric: 'Organza',
+    color: 'Rose Pink',
+    occasion: 'Party & Festive',
+    region: 'Jaipur',
     description:
-      'A handloom Tussar silk saree in natural golden beige, featuring traditional Madhubani-inspired prints. The earthy tones and organic texture make this a collector\'s delight.',
+      'Ethereal rose pink organza saree decorated with delicate embroidery, scalloped gold wire border, and floral hand craftsmanship.',
     images: [
-      '/images/saree-5.jpg',
-      '/images/saree-5b.jpg',
-    ],
-    in_stock: true,
-    featured: false,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '6',
-    name: 'Georgette Garden Dream',
-    slug: 'georgette-garden-dream',
-    price: 4299,
-    mrp: 6999,
-    fabric: 'Georgette',
-    color: 'Pink',
-    occasion: 'Party',
-    region: 'Rajasthan',
-    description:
-      'A flowing georgette saree adorned with digital floral prints and sequin work border. This contemporary piece is perfect for cocktail parties and evening events.',
-    images: [
-      '/images/saree-6.jpg',
-      '/images/saree-6b.jpg',
-    ],
-    in_stock: true,
-    featured: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '7',
-    name: 'Linen Summer Charm',
-    slug: 'linen-summer-charm',
-    price: 2999,
-    mrp: 4499,
-    fabric: 'Linen',
-    color: 'Green',
-    occasion: 'Casual',
-    region: 'West Bengal',
-    description:
-      'A crisp linen saree in refreshing green with minimalist handloom stripes. Perfect for summer outings and office wear. Breathable, eco-friendly, and effortlessly chic.',
-    images: [
-      '/images/saree-7.jpg',
-      '/images/saree-7b.jpg',
-    ],
-    in_stock: false,
-    featured: false,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '8',
-    name: 'Patola Double Ikat',
-    slug: 'patola-double-ikat',
-    price: 24999,
-    mrp: 35000,
-    fabric: 'Silk',
-    color: 'Red',
-    occasion: 'Wedding',
-    region: 'Gujarat',
-    description:
-      'A rare Patola double ikat silk saree from Patan, Gujarat. Each saree takes months of meticulous craftsmanship. The geometric patterns and vibrant colors are a testament to India\'s rich textile heritage.',
-    images: [
-      '/images/saree-8.jpg',
-      '/images/saree-8b.jpg',
+      'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80',
     ],
     in_stock: true,
     featured: true,
@@ -164,7 +157,6 @@ export const mockProducts: Product[] = [
   },
 ];
 
-// Helper to get unique values for filters
 export function getUniqueFabrics(): string[] {
   return [...new Set(mockProducts.map((p) => p.fabric))];
 }

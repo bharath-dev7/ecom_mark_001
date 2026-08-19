@@ -1,69 +1,65 @@
 import Link from 'next/link';
 import { Heart, MapPin, Phone, Mail } from 'lucide-react';
+import { RoyalCrestLogo } from './OrnamentalIcons';
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--color-surface)] border-t border-[var(--color-border)] mt-auto">
-      {/* Top divider */}
-      <div className="divider-gold" />
+    <footer className="bg-[#38030B] text-[#E8C86B] border-t-2 border-[#C59B27] mt-auto font-serif">
+      {/* Decorative Gold Border Line */}
+      <div className="bg-[#6A091A] text-[10px] tracking-[0.3em] uppercase text-center py-2 border-b border-[#C59B27]/40 text-[#E8C86B]">
+        ❖ ZEYANA — HERITAGE HANDLOOM SAREES & ROYAL ETHNIC WEAR ❖
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div className="space-y-4">
+          {/* Brand & Crest */}
+          <div className="space-y-4 text-center sm:text-left">
             <Link href="/" className="inline-block">
-              <span className="font-display text-3xl font-bold text-gradient-gold">
-                सारी
-              </span>
-              <span className="block font-display text-sm text-[var(--color-text-muted)] italic mt-1">
-                Collection
-              </span>
+              <RoyalCrestLogo className="scale-95" />
             </Link>
-            <p className="text-sm text-[var(--color-text-dim)] leading-relaxed max-w-xs">
-              Curating India&apos;s finest handloom sarees from master weavers
-              across the country. Every thread weaves a story of tradition and
-              elegance.
+            <p className="text-xs text-[#EBE2D0] leading-relaxed max-w-xs font-sans">
+              Curating India&apos;s finest handloom sarees from master weavers across Varanasi, Kanchipuram, and Chanderi.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-display text-sm font-semibold text-[var(--color-cream)] uppercase tracking-wider mb-4">
-              Quick Links
+            <h3 className="font-serif text-sm font-bold text-[#FFFDF8] uppercase tracking-[0.2em] mb-4 border-b border-[#C59B27]/30 pb-2">
+              QUICK LINKS
             </h3>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2.5 text-xs text-[#EBE2D0]">
               {[
-                { href: '/shop', label: 'Shop All' },
-                { href: '/about', label: 'Our Story' },
-                { href: '/contact', label: 'Contact Us' },
-                { href: '/cart', label: 'Shopping Bag' },
+                { href: '/shop', label: 'EXPLORE COLLECTIONS' },
+                { href: '/about', label: 'OUR HERITAGE' },
+                { href: '/contact', label: 'BOUTIQUE CONTACT' },
+                { href: '/cart', label: 'ROYAL BAG' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[var(--color-text-dim)] hover:text-[var(--color-gold)] transition-colors duration-200"
+                    className="hover:text-[#E8C86B] transition-colors"
                   >
-                    {link.label}
+                    ❖ {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Categories */}
+          {/* Collections */}
           <div>
-            <h3 className="font-display text-sm font-semibold text-[var(--color-cream)] uppercase tracking-wider mb-4">
-              Collections
+            <h3 className="font-serif text-sm font-bold text-[#FFFDF8] uppercase tracking-[0.2em] mb-4 border-b border-[#C59B27]/30 pb-2">
+              FEATURED CRAFTS
             </h3>
-            <ul className="space-y-2.5">
-              {['Silk Sarees', 'Cotton Sarees', 'Georgette Sarees', 'Wedding Collection', 'Casual Wear'].map(
+            <ul className="space-y-2.5 text-xs text-[#EBE2D0]">
+              {['Kanjivaram Silk Sarees', 'Royal Banarasi Brocades', 'Chanderi & Organza', 'Bridal Lehenga Choli', 'Festive Collection'].map(
                 (cat) => (
                   <li key={cat}>
                     <Link
                       href="/shop"
-                      className="text-sm text-[var(--color-text-dim)] hover:text-[var(--color-gold)] transition-colors duration-200"
+                      className="hover:text-[#E8C86B] transition-colors"
                     >
-                      {cat}
+                      ❖ {cat}
                     </Link>
                   </li>
                 )
@@ -73,33 +69,25 @@ export default function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-display text-sm font-semibold text-[var(--color-cream)] uppercase tracking-wider mb-4">
-              Get in Touch
+            <h3 className="font-serif text-sm font-bold text-[#FFFDF8] uppercase tracking-[0.2em] mb-4 border-b border-[#C59B27]/30 pb-2">
+              ROYAL CONCIERGE
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-3 text-xs text-[#EBE2D0]">
               <li className="flex items-start gap-2.5">
-                <Phone className="w-4 h-4 text-[var(--color-gold)] mt-0.5 flex-shrink-0" />
-                <a
-                  href="tel:+919347365885"
-                  className="text-sm text-[var(--color-text-dim)] hover:text-[var(--color-gold)] transition-colors"
-                >
+                <Phone className="w-4 h-4 text-[#C59B27] mt-0.5 flex-shrink-0" />
+                <a href="tel:+919347365885" className="hover:text-[#E8C86B]">
                   +91 93473 65885
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
-                <Mail className="w-4 h-4 text-[var(--color-gold)] mt-0.5 flex-shrink-0" />
-                <a
-                  href="mailto:hello@saricollection.com"
-                  className="text-sm text-[var(--color-text-dim)] hover:text-[var(--color-gold)] transition-colors"
-                >
-                  hello@saricollection.com
+                <Mail className="w-4 h-4 text-[#C59B27] mt-0.5 flex-shrink-0" />
+                <a href="mailto:concierge@zeyana.com" className="hover:text-[#E8C86B]">
+                  concierge@zeyana.com
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[var(--color-gold)] mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-[var(--color-text-dim)]">
-                  Hyderabad, Telangana, India
-                </span>
+                <MapPin className="w-4 h-4 text-[#C59B27] mt-0.5 flex-shrink-0" />
+                <span>Hyderabad & Varanasi Flagship Stores, India</span>
               </li>
             </ul>
           </div>
@@ -107,14 +95,11 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-[var(--color-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-[var(--color-text-dim)]">
-            © {new Date().getFullYear()} सारी Collection. All rights reserved.
-          </p>
-          <p className="text-xs text-[var(--color-text-dim)] flex items-center gap-1">
-            Made with{' '}
-            <Heart className="w-3 h-3 text-red-500 fill-red-500" /> in India
+      <div className="border-t border-[#C59B27]/40 bg-[#290207] py-4 text-center">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#EBE2D0]">
+          <p>© {new Date().getFullYear()} ZEYANA SAREES & MORE. All Rights Reserved.</p>
+          <p className="flex items-center gap-1">
+            Handcrafted with <Heart className="w-3.5 h-3.5 text-[#E8C86B] fill-[#E8C86B]" /> in India
           </p>
         </div>
       </div>

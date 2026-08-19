@@ -2,19 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  LogIn,
-  LogOut,
-  Plus,
-  Pencil,
-  Trash2,
-  Save,
-  X,
-  Package,
-  ShieldCheck,
-} from 'lucide-react';
-import { supabase, Product, isSupabaseConfigured } from '@/lib/supabase';
+import { LogIn, LogOut, Plus, Pencil, Trash2, Save, X, Package, ShieldCheck } from 'lucide-react';
+import { supabase, Product } from '@/lib/supabase';
 import { mockProducts } from '@/lib/mockData';
+import { SectionDivider } from '@/components/OrnamentalIcons';
 
 type ProductForm = {
   name: string;
@@ -58,14 +49,11 @@ export default function AdminPage() {
   const [supabaseConfigured, setSupabaseConfigured] = useState(false);
 
   useEffect(() => {
-    // Check if supabase is configured
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     setSupabaseConfigured(!!url && url.length > 0);
 
-    // Check existing session
     const checkSession = async () => {
       if (!url || url.length === 0) {
-        // Use mock data when supabase isn't configured
         setProducts(mockProducts);
         return;
       }
@@ -98,7 +86,6 @@ export default function AdminPage() {
     setAuthLoading(true);
 
     if (!supabaseConfigured) {
-      // Demo mode login
       if (email === 'admin@demo.com' && password === 'admin123') {
         setIsAuthenticated(true);
         setProducts(mockProducts);
@@ -109,11 +96,7 @@ export default function AdminPage() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setAuthError(error.message);
     } else {
@@ -158,7 +141,6 @@ export default function AdminPage() {
 
   const handleSave = async () => {
     if (!supabaseConfigured) {
-      // Demo mode: just close the editor
       setIsEditing(false);
       return;
     }
@@ -207,46 +189,46 @@ export default function AdminPage() {
   // Login Screen
   if (!isAuthenticated) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center px-4 page-enter">
+      <div className="min-h-[80vh] flex items-center justify-center px-4 bg-[#FAF6EE] font-serif py-16">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md"
         >
-          <div className="p-8 rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border)]">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 flex items-center justify-center mx-auto mb-4">
-                <ShieldCheck className="w-8 h-8 text-[var(--color-gold)]" />
+          <div className="p-8 rounded-lg bg-[#FFFDF8] border-2 border-[#C59B27] shadow-xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-[#6A091A] border-2 border-[#C59B27] flex items-center justify-center mx-auto mb-4 text-[#E8C86B]">
+                <ShieldCheck className="w-8 h-8" />
               </div>
-              <h1 className="font-display text-2xl font-bold text-[var(--color-cream)]">
-                Admin Login
+              <h1 className="font-serif text-2xl font-bold text-[#6A091A] uppercase tracking-wider">
+                BOUTIQUE ADMIN LOGIN
               </h1>
-              <p className="text-sm text-[var(--color-text-dim)] mt-2">
-                Sign in to manage your product catalog
+              <p className="text-xs font-sans text-[#7C6354] mt-1">
+                Manage handloom inventory & collections
               </p>
               {!supabaseConfigured && (
-                <p className="text-xs text-[var(--color-gold)] mt-3 p-2 rounded-lg bg-[var(--color-gold)]/5 border border-[var(--color-gold)]/10">
+                <p className="text-xs font-mono text-[#6A091A] mt-3 p-2 rounded bg-[#FAF6EE] border border-[#C59B27]/40">
                   Demo Mode — Use admin@demo.com / admin123
                 </p>
               )}
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4 font-sans">
               <div>
-                <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                  Email
+                <label className="text-xs font-serif font-bold text-[#7C6354] uppercase tracking-wider mb-1 block">
+                  Admin Email
                 </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] placeholder:text-[var(--color-text-dim)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
+                  placeholder="admin@demo.com"
+                  className="w-full px-4 py-2.5 rounded bg-[#FAF6EE] border border-[#C59B27]/40 text-sm text-[#241416] focus:border-[#6A091A] focus:outline-none"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
+                <label className="text-xs font-serif font-bold text-[#7C6354] uppercase tracking-wider mb-1 block">
                   Password
                 </label>
                 <input
@@ -255,12 +237,12 @@ export default function AdminPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] placeholder:text-[var(--color-text-dim)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
+                  className="w-full px-4 py-2.5 rounded bg-[#FAF6EE] border border-[#C59B27]/40 text-sm text-[#241416] focus:border-[#6A091A] focus:outline-none"
                 />
               </div>
 
               {authError && (
-                <p className="text-sm text-red-400 bg-red-900/20 rounded-lg p-3">
+                <p className="text-xs text-red-700 bg-red-100 border border-red-300 rounded p-2.5">
                   {authError}
                 </p>
               )}
@@ -268,10 +250,10 @@ export default function AdminPage() {
               <button
                 type="submit"
                 disabled={authLoading}
-                className="btn-gold w-full flex items-center justify-center gap-2 text-sm"
+                className="btn-maroon-gold w-full py-3 rounded-full font-serif font-bold text-xs tracking-widest flex items-center justify-center gap-2 uppercase shadow-md"
               >
-                <LogIn className="w-4 h-4" />
-                {authLoading ? 'Signing in...' : 'Sign In'}
+                <LogIn className="w-4 h-4 text-[#E8C86B]" />
+                {authLoading ? 'AUTHENTICATING...' : 'AUTHENTICATE ADMIN'}
               </button>
             </form>
           </div>
@@ -280,37 +262,99 @@ export default function AdminPage() {
     );
   }
 
-  // Admin Dashboard
+  // Dashboard Screen
   return (
-    <div className="page-enter">
-      {/* Header */}
-      <section className="py-8 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
+    <div className="bg-[#FAF6EE] min-h-screen font-serif text-[#241416]">
+      {/* Header Banner */}
+      <section className="py-8 bg-[#38030B] border-b-2 border-[#C59B27]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--color-cream)]">
-              Admin <span className="text-gradient-gold">Dashboard</span>
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#E8C86B] uppercase tracking-wider">
+              ROYAL BOUTIQUE MANAGEMENT
             </h1>
-            <p className="text-sm text-[var(--color-text-dim)] mt-1">
-              {products.length} products in catalog
-              {!supabaseConfigured && ' (Demo Mode)'}
+            <p className="text-xs font-sans text-[#EBE2D0] mt-1">
+              Catalog inventory: {products.length} products
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={startCreate} className="btn-gold text-sm flex items-center gap-2">
+            <button onClick={startCreate} className="btn-maroon-gold text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-2 uppercase">
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Add Product</span>
+              <span>ADD NEW WEAVE</span>
             </button>
             <button
               onClick={handleLogout}
-              className="p-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-red-500/30 transition-colors group"
+              className="p-2.5 rounded-full bg-[#FAF6EE] text-[#6A091A] border border-[#C59B27] hover:bg-[#6A091A] hover:text-[#E8C86B] transition-colors"
             >
-              <LogOut className="w-4 h-4 text-[var(--color-text-dim)] group-hover:text-red-400" />
+              <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
       </section>
 
-      {/* Product Editor Modal */}
+      {/* Products Table */}
+      <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="rounded-lg bg-[#FFFDF8] border border-[#E2D7C3] shadow-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-serif">
+              <thead>
+                <tr className="bg-[#38030B] text-[#E8C86B] border-b border-[#C59B27] uppercase tracking-wider">
+                  <th className="px-5 py-3">Product Name</th>
+                  <th className="px-5 py-3 hidden sm:table-cell">Fabric</th>
+                  <th className="px-5 py-3">Price</th>
+                  <th className="px-5 py-3 hidden md:table-cell">Status</th>
+                  <th className="px-5 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E2D7C3]">
+                {products.map((product) => (
+                  <tr key={product.id} className="hover:bg-[#FAF6EE] transition-colors">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded bg-[#6A091A] text-[#E8C86B] flex items-center justify-center flex-shrink-0">
+                          <Package className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-[#6A091A] text-sm">{product.name}</p>
+                          <p className="text-[10px] text-[#7C6354] font-sans">/{product.slug}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 hidden sm:table-cell font-sans text-[#7C6354]">
+                      {product.fabric}
+                    </td>
+                    <td className="px-5 py-4 font-bold text-[#6A091A] text-sm">
+                      ₹{product.price.toLocaleString('en-IN')}
+                    </td>
+                    <td className="px-5 py-4 hidden md:table-cell font-sans">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${product.in_stock ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                        {product.in_stock ? 'IN STOCK' : 'SOLD OUT'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => startEdit(product)}
+                          className="p-1.5 rounded bg-[#FAF6EE] text-[#6A091A] border border-[#C59B27]/40 hover:bg-[#6A091A] hover:text-[#E8C86B]"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="p-1.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-700 hover:text-white"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Editor Modal */}
       <AnimatePresence>
         {isEditing && (
           <>
@@ -319,261 +363,83 @@ export default function AdminPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsEditing(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-[#38030B]/60 backdrop-blur-xs z-[60]"
             />
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 30 }}
-              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-2xl sm:max-h-[85vh] bg-[var(--color-bg)] border border-[var(--color-border)] rounded-2xl z-[70] overflow-y-auto"
+              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-2xl bg-[#FAF6EE] border-2 border-[#C59B27] rounded-lg z-[70] p-6 shadow-2xl font-serif max-h-[90vh] overflow-y-auto"
             >
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-display text-xl font-semibold text-[var(--color-cream)]">
-                    {editingId ? 'Edit Product' : 'New Product'}
-                  </h2>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="p-2 rounded-lg hover:bg-[var(--color-bg-elevated)] transition-colors"
-                  >
-                    <X className="w-5 h-5 text-[var(--color-text-muted)]" />
-                  </button>
-                </div>
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#C59B27]">
+                <h2 className="font-serif text-lg font-bold text-[#6A091A] uppercase tracking-wider">
+                  {editingId ? 'EDIT WEAVE SPECIFICATION' : 'NEW HANDLOOM PRODUCT'}
+                </h2>
+                <button onClick={() => setIsEditing(false)} className="p-1 text-[#6A091A]">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="sm:col-span-2">
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      value={form.name}
-                      onChange={(e) => {
-                        setForm({
-                          ...form,
-                          name: e.target.value,
-                          slug: autoSlug(e.target.value),
-                        });
-                      }}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Price (₹)
-                    </label>
-                    <input
-                      type="number"
-                      value={form.price}
-                      onChange={(e) => setForm({ ...form, price: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      MRP (₹)
-                    </label>
-                    <input
-                      type="number"
-                      value={form.mrp}
-                      onChange={(e) => setForm({ ...form, mrp: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Fabric
-                    </label>
-                    <select
-                      value={form.fabric}
-                      onChange={(e) => setForm({ ...form, fabric: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    >
-                      {['Silk', 'Cotton', 'Georgette', 'Linen', 'Crepe', 'Tussar Silk', 'Chiffon'].map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Color
-                    </label>
-                    <input
-                      type="text"
-                      value={form.color}
-                      onChange={(e) => setForm({ ...form, color: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Occasion
-                    </label>
-                    <select
-                      value={form.occasion}
-                      onChange={(e) => setForm({ ...form, occasion: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    >
-                      {['Wedding', 'Festival', 'Casual', 'Party', 'Office', 'Traditional'].map((o) => (
-                        <option key={o} value={o}>{o}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Region
-                    </label>
-                    <input
-                      type="text"
-                      value={form.region}
-                      onChange={(e) => setForm({ ...form, region: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="text-xs font-medium text-[var(--color-text-dim)] uppercase tracking-wider mb-1.5 block">
-                      Description
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] focus:border-[var(--color-gold)] focus:outline-none transition-colors resize-none"
-                    />
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={form.in_stock}
-                        onChange={(e) => setForm({ ...form, in_stock: e.target.checked })}
-                        className="accent-[var(--color-gold)]"
-                      />
-                      <span className="text-sm text-[var(--color-text-muted)]">In Stock</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={form.featured}
-                        onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                        className="accent-[var(--color-gold)]"
-                      />
-                      <span className="text-sm text-[var(--color-text-muted)]">Featured</span>
-                    </label>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-sans text-xs">
+                <div className="sm:col-span-2">
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1">Product Title</label>
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value, slug: autoSlug(e.target.value) })}
+                    className="w-full px-3 py-2 rounded bg-[#FFFDF8] border border-[#C59B27]/40 text-sm"
+                  />
                 </div>
-
-                <div className="flex gap-3 mt-6">
-                  <button onClick={handleSave} className="btn-gold flex-1 flex items-center justify-center gap-2 text-sm">
-                    <Save className="w-4 h-4" />
-                    {editingId ? 'Update' : 'Create'} Product
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="btn-outline px-6 text-sm"
+                <div>
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1">Price (₹)</label>
+                  <input
+                    type="number"
+                    value={form.price}
+                    onChange={(e) => setForm({ ...form, price: e.target.value })}
+                    className="w-full px-3 py-2 rounded bg-[#FFFDF8] border border-[#C59B27]/40 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1">MRP (₹)</label>
+                  <input
+                    type="number"
+                    value={form.mrp}
+                    onChange={(e) => setForm({ ...form, mrp: e.target.value })}
+                    className="w-full px-3 py-2 rounded bg-[#FFFDF8] border border-[#C59B27]/40 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1">Fabric</label>
+                  <select
+                    value={form.fabric}
+                    onChange={(e) => setForm({ ...form, fabric: e.target.value })}
+                    className="w-full px-3 py-2 rounded bg-[#FFFDF8] border border-[#C59B27]/40 text-sm"
                   >
-                    Cancel
-                  </button>
+                    {['Silk', 'Cotton', 'Georgette', 'Linen', 'Crepe', 'Tussar Silk', 'Chiffon', 'Kanjivaram Silk'].map((f) => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
                 </div>
+                <div>
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1">Color</label>
+                  <input
+                    type="text"
+                    value={form.color}
+                    onChange={(e) => setForm({ ...form, color: e.target.value })}
+                    className="w-full px-3 py-2 rounded bg-[#FFFDF8] border border-[#C59B27]/40 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button onClick={handleSave} className="btn-maroon-gold flex-1 py-3 rounded-full text-xs font-bold uppercase">
+                  SAVE PRODUCT
+                </button>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-
-      {/* Products Table */}
-      <section className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--color-border)]">
-                    <th className="text-left px-5 py-4 font-display text-xs text-[var(--color-text-dim)] uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="text-left px-5 py-4 font-display text-xs text-[var(--color-text-dim)] uppercase tracking-wider hidden sm:table-cell">
-                      Fabric
-                    </th>
-                    <th className="text-left px-5 py-4 font-display text-xs text-[var(--color-text-dim)] uppercase tracking-wider">
-                      Price
-                    </th>
-                    <th className="text-left px-5 py-4 font-display text-xs text-[var(--color-text-dim)] uppercase tracking-wider hidden md:table-cell">
-                      Status
-                    </th>
-                    <th className="text-right px-5 py-4 font-display text-xs text-[var(--color-text-dim)] uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((product) => (
-                    <tr
-                      key={product.id}
-                      className="border-b border-[var(--color-border)] last:border-b-0 hover:bg-[var(--color-bg-elevated)]/50 transition-colors"
-                    >
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-[var(--color-bg-elevated)] flex items-center justify-center flex-shrink-0">
-                            <Package className="w-4 h-4 text-[var(--color-gold)]" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-medium text-[var(--color-cream)] truncate">
-                              {product.name}
-                            </p>
-                            <p className="text-xs text-[var(--color-text-dim)] truncate">
-                              /{product.slug}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-4 hidden sm:table-cell">
-                        <span className="chip text-xs">{product.fabric}</span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className="font-semibold text-[var(--color-gold)]">
-                          ₹{product.price.toLocaleString('en-IN')}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 hidden md:table-cell">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`w-2 h-2 rounded-full ${product.in_stock ? 'bg-green-500' : 'bg-red-500'}`}
-                          />
-                          <span className="text-xs text-[var(--color-text-muted)]">
-                            {product.in_stock ? 'In Stock' : 'Sold Out'}
-                          </span>
-                          {product.featured && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-gold)]/10 text-[var(--color-gold)]">
-                              Featured
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => startEdit(product)}
-                            className="p-2 rounded-lg hover:bg-[var(--color-bg-elevated)] transition-colors group"
-                          >
-                            <Pencil className="w-4 h-4 text-[var(--color-text-dim)] group-hover:text-[var(--color-gold)]" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(product.id)}
-                            className="p-2 rounded-lg hover:bg-red-900/30 transition-colors group"
-                          >
-                            <Trash2 className="w-4 h-4 text-[var(--color-text-dim)] group-hover:text-red-400" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, LayoutGrid, List } from 'lucide-react';
+import { Search } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/FilterSidebar';
+import { SectionDivider } from '@/components/OrnamentalIcons';
 import {
   mockProducts,
   getUniqueFabrics,
@@ -97,58 +98,47 @@ export default function ShopPage() {
   };
 
   return (
-    <div className="page-enter">
-      {/* Header */}
-      <section className="py-10 sm:py-14 bg-[var(--color-surface)] border-b border-[var(--color-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-display text-3xl sm:text-4xl font-bold text-[var(--color-cream)] mb-2"
-          >
-            Our <span className="text-gradient-gold">Collection</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-[var(--color-text-muted)]"
-          >
-            {mockProducts.length} handpicked sarees from across India
-          </motion.p>
+    <div className="bg-[#FAF6EE] min-h-screen font-serif text-[#241416]">
+      {/* Header Banner */}
+      <section className="py-12 bg-[#38030B] border-b-2 border-[#C59B27] text-center relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <SectionDivider title="ROYAL BOUTIQUE CATALOG" />
+          <p className="text-xs sm:text-sm font-sans tracking-[0.2em] text-[#E8C86B] uppercase mt-2">
+            EXPLORE {mockProducts.length} HANDWOVEN SAREES & LEHENGAS
+          </p>
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Top Bar: Search + Sort + Mobile Filter */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-dim)]" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, fabric, color, occasion..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-cream)] placeholder:text-[var(--color-text-dim)] focus:border-[var(--color-gold)] focus:outline-none transition-colors"
-              />
-            </div>
+      {/* Catalog Content */}
+      <section className="py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Controls: Search & Sort */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          {/* Search Bar */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C59B27]" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by weave, fabric (Silk, Banarasi), color..."
+              className="w-full pl-11 pr-4 py-3 rounded-lg bg-[#FFFDF8] border border-[#C59B27]/40 text-sm font-sans text-[#241416] placeholder:text-[#7C6354] focus:border-[#6A091A] focus:outline-none"
+            />
+          </div>
 
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-3 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-muted)] focus:border-[var(--color-gold)] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="featured">Featured First</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name">Name A-Z</option>
-            </select>
+          {/* Sort Selector */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-3 rounded-lg bg-[#FFFDF8] border border-[#C59B27]/40 text-xs font-serif font-semibold uppercase tracking-wider text-[#6A091A] focus:border-[#6A091A] focus:outline-none cursor-pointer"
+          >
+            <option value="featured">❖ FEATURED FIRST</option>
+            <option value="price-asc">❖ PRICE: LOW TO HIGH</option>
+            <option value="price-desc">❖ PRICE: HIGH TO LOW</option>
+            <option value="name">❖ NAME A-Z</option>
+          </select>
 
-            {/* Mobile Filter */}
+          {/* Mobile Filter Toggle */}
+          <div className="lg:hidden">
             <FilterSidebar
               fabrics={fabrics}
               colors={colors}
@@ -156,15 +146,30 @@ export default function ShopPage() {
               selectedFabrics={selectedFabrics}
               selectedColors={selectedColors}
               selectedOccasions={selectedOccasions}
-              onFabricChange={(f) =>
-                toggleFilter(f, selectedFabrics, setSelectedFabrics)
-              }
-              onColorChange={(c) =>
-                toggleFilter(c, selectedColors, setSelectedColors)
-              }
-              onOccasionChange={(o) =>
-                toggleFilter(o, selectedOccasions, setSelectedOccasions)
-              }
+              onFabricChange={(f) => toggleFilter(f, selectedFabrics, setSelectedFabrics)}
+              onColorChange={(c) => toggleFilter(c, selectedColors, setSelectedColors)}
+              onOccasionChange={(o) => toggleFilter(o, selectedOccasions, setSelectedOccasions)}
+              onClearAll={clearAll}
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              maxPrice={maxPrice}
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-8">
+          {/* Desktop Filter Sidebar */}
+          <div className="hidden lg:block">
+            <FilterSidebar
+              fabrics={fabrics}
+              colors={colors}
+              occasions={occasions}
+              selectedFabrics={selectedFabrics}
+              selectedColors={selectedColors}
+              selectedOccasions={selectedOccasions}
+              onFabricChange={(f) => toggleFilter(f, selectedFabrics, setSelectedFabrics)}
+              onColorChange={(c) => toggleFilter(c, selectedColors, setSelectedColors)}
+              onOccasionChange={(o) => toggleFilter(o, selectedOccasions, setSelectedOccasions)}
               onClearAll={clearAll}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
@@ -172,60 +177,38 @@ export default function ShopPage() {
             />
           </div>
 
-          <div className="flex gap-8">
-            {/* Desktop Sidebar */}
-            <div className="hidden lg:block">
-              <FilterSidebar
-                fabrics={fabrics}
-                colors={colors}
-                occasions={occasions}
-                selectedFabrics={selectedFabrics}
-                selectedColors={selectedColors}
-                selectedOccasions={selectedOccasions}
-                onFabricChange={(f) =>
-                  toggleFilter(f, selectedFabrics, setSelectedFabrics)
-                }
-                onColorChange={(c) =>
-                  toggleFilter(c, selectedColors, setSelectedColors)
-                }
-                onOccasionChange={(o) =>
-                  toggleFilter(o, selectedOccasions, setSelectedOccasions)
-                }
-                onClearAll={clearAll}
-                priceRange={priceRange}
-                onPriceRangeChange={setPriceRange}
-                maxPrice={maxPrice}
-              />
-            </div>
-
-            {/* Products Grid */}
-            <div className="flex-1">
-              {filteredProducts.length === 0 ? (
-                <div className="text-center py-20">
-                  <p className="text-6xl mb-4">🥻</p>
-                  <h3 className="font-display text-xl text-[var(--color-cream)] mb-2">
-                    No sarees found
-                  </h3>
-                  <p className="text-[var(--color-text-dim)] mb-6">
-                    Try adjusting your filters or search query
-                  </p>
-                  <button onClick={clearAll} className="btn-outline text-sm">
-                    Clear All Filters
-                  </button>
+          {/* Products Grid */}
+          <div className="flex-1">
+            {filteredProducts.length === 0 ? (
+              <div className="text-center py-20 bg-[#FFFDF8] rounded-lg border border-[#E2D7C3] p-8">
+                <span className="text-5xl block mb-4">🥻</span>
+                <h3 className="font-serif text-2xl font-semibold text-[#6A091A] mb-2">
+                  No Sarees Found Matching Criteria
+                </h3>
+                <p className="text-sm font-sans text-[#7C6354] mb-6">
+                  Please try resetting your search term or adjusting filter values.
+                </p>
+                <button
+                  onClick={clearAll}
+                  className="btn-maroon-gold text-xs px-6 py-2.5 rounded-full uppercase"
+                >
+                  CLEAR ALL FILTERS
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center mb-6 border-b border-[#C59B27]/30 pb-2">
+                  <span className="text-xs font-serif tracking-wider uppercase text-[#7C6354]">
+                    SHOWING {filteredProducts.length} OF {mockProducts.length} SAREES
+                  </span>
                 </div>
-              ) : (
-                <>
-                  <p className="text-sm text-[var(--color-text-dim)] mb-4">
-                    Showing {filteredProducts.length} of {mockProducts.length} sarees
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredProducts.map((product) => (
-                      <ProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

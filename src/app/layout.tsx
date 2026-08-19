@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Outfit } from "next/font/google";
+import { Playfair_Display, Cormorant_Garamond, Outfit } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
   subsets: ["latin"],
   display: "swap",
 });
@@ -17,9 +24,9 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "सारी Collection | Premium Handloom Sarees from India",
+  title: "ZEYANA | Sarees & Royal Ethnic Collection",
   description:
-    "Discover India's finest handloom sarees — Kanjivaram, Banarasi, Chanderi, and more. Curated from master weavers across the country. Shop now and order via WhatsApp.",
+    "Discover India's finest handloom sarees — Kanjivaram, Banarasi, Silk, Chiffon & Festive Collections. Curated for royal elegance.",
   keywords: [
     "sarees",
     "handloom",
@@ -27,19 +34,24 @@ export const metadata: Metadata = {
     "Indian sarees",
     "Kanjivaram",
     "Banarasi",
-    "online saree store",
+    "Zeyana sarees",
+    "festive collection",
   ],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${outfit.variable} h-full antialiased`}
+      className={`${playfair.variable} ${cormorant.variable} ${outfit.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-[#FAF6EE] text-[#241416]">
         <Navbar />
-        <main className="flex-1 pt-16 sm:pt-20">{children}</main>
+        <main className="flex-1">{children}</main>
         <Footer />
       </body>
     </html>
