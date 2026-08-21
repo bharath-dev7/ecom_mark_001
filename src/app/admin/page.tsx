@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogIn, LogOut, Plus, Pencil, Trash2, Save, X, Package, ShieldCheck, Upload, Image as ImageIcon, Zap, Sparkles, Wand2, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { supabase, Product } from '@/lib/supabase';
+import { useToast } from '@/components/Toast';
 import { mockProducts } from '@/lib/mockData';
 import { compressImage, formatBytes, CompressionResult } from '@/lib/imageCompression';
 import { invalidateProductsCache } from '@/lib/productService';
@@ -45,6 +46,7 @@ const emptyForm: ProductForm = {
 };
 
 export default function AdminPage() {
+  const { addToast, confirm } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -110,22 +112,20 @@ export default function AdminPage() {
     setAuthError('');
     setAuthLoading(true);
 
-    // Bypass check for fast testing or demo credentials
-    if (!supabaseConfigured || email === 'admin' || email === 'admin@demo.com' || password === 'admin' || password === 'admin123') {
-      setIsAuthenticated(true);
-      fetchProducts();
+    if (!supabaseConfigured) {
+      setAuthError('Supabase is not configured. Please set environment variables.');
       setAuthLoading(false);
       return;
     }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      // Fallback bypass for developer testing if Supabase Auth user is not created yet
-      setIsAuthenticated(true);
-      fetchProducts();
+      setAuthError(error.message || 'Invalid credentials. Please try again.');
+      addToast({ type: 'error', title: 'Login Failed', message: error.message });
     } else {
       setIsAuthenticated(true);
       fetchProducts();
+      addToast({ type: 'success', title: 'Welcome Back', message: 'Admin session authenticated.' });
     }
     setAuthLoading(false);
   };
@@ -203,7 +203,7 @@ export default function AdminPage() {
             });
 
           if (uploadError) {
-            alert(`Image upload error: ${uploadError.message}. Make sure 'saree-images' bucket exists in Supabase Storage.`);
+            addToast({ type: 'error', title: 'Upload Error', message: `${uploadError.message}. Ensure 'saree-images' bucket exists in Supabase Storage.` });
           } else {
             const { data: publicUrlData } = supabase.storage
               .from('saree-images')
@@ -220,7 +220,7 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error('Image compression or upload error:', err);
-      alert('Failed to compress saree image. Please check image format.');
+      addToast({ type: 'error', title: 'Compression Failed', message: 'Please check the image format and try again.' });
     } finally {
       setUploadingImage(false);
     }
@@ -335,7 +335,8 @@ export default function AdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this saree product?')) return;
+    const confirmed = await confirm('Delete Product', 'Are you sure you want to permanently delete this saree product? This action cannot be undone.');
+    if (!confirmed) return;
     invalidateProductsCache();
     if (supabaseConfigured) {
       await supabase.from('products').delete().eq('id', id);
@@ -343,6 +344,7 @@ export default function AdminPage() {
     } else {
       setProducts(products.filter((p) => p.id !== id));
     }
+    addToast({ type: 'success', title: 'Product Deleted', message: 'The saree has been removed from the catalog.' });
   };
 
   const autoSlug = (name: string) => {
@@ -374,7 +376,7 @@ export default function AdminPage() {
               </p>
               {!supabaseConfigured && (
                 <p className="text-xs font-mono text-[#6A091A] mt-3 p-2 rounded bg-[#FAF6EE] border border-[#C59B27]/40">
-                  Demo Mode — Use admin@demo.com / admin123
+                  Supabase not configured — Admin login requires valid Supabase Auth credentials.
                 </p>
               )}
             </div>
@@ -422,14 +424,7 @@ export default function AdminPage() {
                 {authLoading ? 'AUTHENTICATING...' : 'AUTHENTICATE ADMIN'}
               </button>
 
-              <button
-                type="button"
-                onClick={() => handleLogin()}
-                className="w-full py-2.5 rounded-full bg-[#FAF6EE] text-[#6A091A] border border-[#C59B27] font-serif font-bold text-xs tracking-wider uppercase hover:bg-[#6A091A] hover:text-[#E8C86B] transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Zap className="w-3.5 h-3.5 text-[#C59B27]" />
-                ⚡ QUICK TEST BYPASS (1-CLICK ACCESS)
-              </button>
+
             </form>
           </div>
         </motion.div>

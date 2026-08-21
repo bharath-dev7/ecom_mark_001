@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Search, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
@@ -10,7 +11,8 @@ import { getAllProducts } from '@/lib/productService';
 import { Product } from '@/lib/supabase';
 import { mockProducts } from '@/lib/mockData';
 
-export default function ShopPage() {
+function ShopPageContent() {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -19,6 +21,7 @@ export default function ShopPage() {
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>('featured');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
+  const [initialFiltersApplied, setInitialFiltersApplied] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -29,10 +32,53 @@ export default function ShopPage() {
         const max = Math.max(...data.map((p) => p.price));
         setPriceRange([0, max]);
       }
+
+      // Apply URL query parameters as initial filters
+      const categoryParam = searchParams.get('category');
+      const fabricParam = searchParams.get('fabric');
+      const occasionParam = searchParams.get('occasion');
+      const searchParam = searchParams.get('search') || searchParams.get('q');
+
+      if (categoryParam && data.length > 0) {
+        // Match category slug against product fabric, occasion, or name fields
+        const categoryLower = categoryParam.toLowerCase().replace(/-/g, ' ');
+        const matchingFabrics = Array.from(new Set(data.map((p) => p.fabric)))
+          .filter((f) => f.toLowerCase().includes(categoryLower) || categoryLower.includes(f.toLowerCase()));
+        const matchingOccasions = Array.from(new Set(data.map((p) => p.occasion)))
+          .filter((o) => o.toLowerCase().includes(categoryLower) || categoryLower.includes(o.toLowerCase()));
+
+        if (matchingFabrics.length > 0) {
+          setSelectedFabrics(matchingFabrics);
+        } else if (matchingOccasions.length > 0) {
+          setSelectedOccasions(matchingOccasions);
+        } else {
+          // Fallback: set as search text so the user still sees related results
+          setSearch(categoryParam.replace(/-/g, ' '));
+        }
+      }
+
+      if (fabricParam) {
+        const matchingFabrics = Array.from(new Set(data.map((p) => p.fabric)))
+          .filter((f) => f.toLowerCase().includes(fabricParam.toLowerCase()));
+        if (matchingFabrics.length > 0) setSelectedFabrics((prev) => [...new Set([...prev, ...matchingFabrics])]);
+      }
+
+      if (occasionParam) {
+        const matchingOccasions = Array.from(new Set(data.map((p) => p.occasion)))
+          .filter((o) => o.toLowerCase().includes(occasionParam.toLowerCase()));
+        if (matchingOccasions.length > 0) setSelectedOccasions((prev) => [...new Set([...prev, ...matchingOccasions])]);
+      }
+
+      if (searchParam) {
+        setSearch(searchParam);
+      }
+
+      setInitialFiltersApplied(true);
       setLoading(false);
     }
     loadData();
-  }, []);
+  }, [searchParams]);
+
 
   const fabrics = useMemo(() => Array.from(new Set(products.map((p) => p.fabric))), [products]);
   const colors = useMemo(() => Array.from(new Set(products.map((p) => p.color))), [products]);
@@ -231,5 +277,20 @@ export default function ShopPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[60vh] flex flex-col items-center justify-center bg-[#FAF6EE]">
+          <Loader2 className="w-8 h-8 text-[#6A091A] animate-spin mb-3" />
+          <p className="font-serif text-sm text-[#7C6354]">Loading boutique catalog...</p>
+        </div>
+      }
+    >
+      <ShopPageContent />
+    </Suspense>
   );
 }

@@ -206,11 +206,13 @@ export default function FilterSidebar({
               <input
                 type="number"
                 value={priceRange[0]}
-                onChange={(e) =>
-                  onPriceRangeChange([Number(e.target.value), priceRange[1]])
-                }
+                onChange={(e) => {
+                  const val = Math.max(0, Math.min(Number(e.target.value), priceRange[1]));
+                  onPriceRangeChange([val, priceRange[1]]);
+                }}
                 className="w-full mt-1 px-3 py-1.5 rounded bg-[#FAF6EE] border border-[#C59B27]/40 text-sm text-[#241416] focus:border-[#6A091A] focus:outline-none"
                 min={0}
+                max={priceRange[1]}
               />
             </div>
             <span className="text-[#7C6354] mt-5">—</span>
@@ -219,11 +221,13 @@ export default function FilterSidebar({
               <input
                 type="number"
                 value={priceRange[1]}
-                onChange={(e) =>
-                  onPriceRangeChange([priceRange[0], Number(e.target.value)])
-                }
+                onChange={(e) => {
+                  const val = Math.max(priceRange[0], Math.min(Number(e.target.value), maxPrice));
+                  onPriceRangeChange([priceRange[0], val]);
+                }}
                 className="w-full mt-1 px-3 py-1.5 rounded bg-[#FAF6EE] border border-[#C59B27]/40 text-sm text-[#241416] focus:border-[#6A091A] focus:outline-none"
-                min={0}
+                min={priceRange[0]}
+                max={maxPrice}
               />
             </div>
           </div>

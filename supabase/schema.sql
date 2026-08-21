@@ -70,3 +70,42 @@ VALUES
 ('Mehendi Green Kanjivaram Saree', 'mehendi-green-kanjivaram-saree', 4299.00, 6999.00, 'Kanjivaram Silk', 'Mehendi Green', 'Wedding', 'Kanchipuram', 'Authentic Kanchipuram silk saree in mehendi green featuring contrasting crimson pallu and heavy gold thread weaving.', ARRAY['https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80'], true),
 ('Peach Gold Tissue Saree', 'peach-gold-tissue-saree', 2699.00, 4499.00, 'Tissue Silk', 'Peach Gold', 'Festive', 'Chanderi', 'Luminous peach gold tissue silk saree with shimmering golden sheen and delicate hand-carved golden pallu flourishes.', ARRAY['https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80'], true)
 ON CONFLICT (slug) DO NOTHING;
+
+-- ============================================================
+-- 6. Inquiries Table (Contact Form Persistence)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS inquiries (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name        TEXT NOT NULL,
+  email       TEXT NOT NULL,
+  phone       TEXT,
+  message     TEXT NOT NULL,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
+
+-- Allow public to submit contact inquiries
+CREATE POLICY "Allow public insert inquiries" ON inquiries
+  FOR INSERT WITH CHECK (true);
+
+-- Only authenticated admin can read inquiries
+CREATE POLICY "Allow authenticated read inquiries" ON inquiries
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE INDEX IF NOT EXISTS idx_inquiries_created ON inquiries(created_at DESC);
+
+-- ============================================================
+-- 7. Extend Orders Table (Add delivery address fields if missing)
+-- ============================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'orders' AND column_name = 'city') THEN
+    ALTER TABLE orders ADD COLUMN city TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'orders' AND column_name = 'pincode') THEN
+    ALTER TABLE orders ADD COLUMN pincode TEXT;
+  END IF;
+END
+$$;
+

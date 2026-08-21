@@ -1,16 +1,36 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Trash2, Minus, Plus, ShoppingBag, MessageCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trash2, Minus, Plus, ShoppingBag, MessageCircle, ArrowLeft, ArrowRight, MapPin, User, Phone, X, Loader2 } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { getWhatsAppLink } from '@/lib/whatsapp';
+import { createOrder } from '@/lib/orderService';
+import { useToast } from '@/components/Toast';
 import { useState, useEffect } from 'react';
+
+interface CheckoutForm {
+  name: string;
+  phone: string;
+  city: string;
+  pincode: string;
+}
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, clearCart, getTotalItems, getTotalPrice } = useCartStore();
+  const { addToast } = useToast();
 
   const [mounted, setMounted] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>({
+    name: '',
+    phone: '',
+    city: '',
+    pincode: '',
+  });
+  const [formErrors, setFormErrors] = useState<Partial<CheckoutForm>>({});
+
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
@@ -52,7 +72,85 @@ export default function CartPage() {
     );
   }
 
-  const whatsappLink = getWhatsAppLink(items, totalPrice);
+  const validateForm = (): boolean => {
+    const errors: Partial<CheckoutForm> = {};
+
+    if (!checkoutForm.name.trim() || checkoutForm.name.trim().length < 2) {
+      errors.name = 'Please enter your full name';
+    }
+
+    const phoneClean = checkoutForm.phone.replace(/\s+/g, '');
+    if (!/^(\+91)?[6-9]\d{9}$/.test(phoneClean)) {
+      errors.phone = 'Enter a valid 10-digit Indian mobile number';
+    }
+
+    if (!checkoutForm.city.trim() || checkoutForm.city.trim().length < 2) {
+      errors.city = 'Please enter your city name';
+    }
+
+    if (!/^\d{6}$/.test(checkoutForm.pincode.trim())) {
+      errors.pincode = 'Enter a valid 6-digit pincode';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleCheckoutSubmit = async () => {
+    if (!validateForm()) return;
+
+    setCheckoutLoading(true);
+
+    try {
+      // 1. Persist order to database
+      const orderResult = await createOrder({
+        customerName: checkoutForm.name.trim(),
+        phone: checkoutForm.phone.replace(/\s+/g, ''),
+        city: checkoutForm.city.trim(),
+        pincode: checkoutForm.pincode.trim(),
+        items,
+        totalAmount: totalPrice,
+      });
+
+      // 2. Generate WhatsApp link with order details
+      const whatsappLink = getWhatsAppLink(
+        items,
+        totalPrice,
+        {
+          name: checkoutForm.name.trim(),
+          phone: checkoutForm.phone.replace(/\s+/g, ''),
+          city: checkoutForm.city.trim(),
+          pincode: checkoutForm.pincode.trim(),
+        },
+        orderResult.orderId || undefined
+      );
+
+      // 3. Show success toast
+      addToast({
+        type: 'success',
+        title: 'Order Placed Successfully!',
+        message: `Order ${orderResult.orderId} recorded. Redirecting to WhatsApp...`,
+        duration: 5000,
+      });
+
+      // 4. Clear cart and close modal
+      setShowCheckoutModal(false);
+      clearCart();
+
+      // 5. Redirect to WhatsApp
+      setTimeout(() => {
+        window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+      }, 500);
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Checkout Error',
+        message: 'Something went wrong. Please try again.',
+      });
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   return (
     <div className="bg-[#FAF6EE] min-h-screen font-sans text-[#241416]">
@@ -129,7 +227,10 @@ export default function CartPage() {
                         ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                       </span>
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => {
+                          removeItem(item.id);
+                          addToast({ type: 'info', title: 'Item Removed', message: `${item.name} removed from bag.` });
+                        }}
                         className="p-1.5 text-[#8C6B4F] hover:text-[#6A091A] transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -149,7 +250,10 @@ export default function CartPage() {
                 CONTINUE SHOPPING
               </Link>
               <button
-                onClick={clearCart}
+                onClick={() => {
+                  clearCart();
+                  addToast({ type: 'info', title: 'Bag Cleared', message: 'All items have been removed.' });
+                }}
                 className="text-xs font-semibold tracking-wider text-red-700 hover:underline uppercase"
               >
                 CLEAR BAG
@@ -180,25 +284,163 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* Prominent CTA */}
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* Checkout Button — opens address modal */}
+              <button
+                onClick={() => setShowCheckoutModal(true)}
                 className="btn-maroon-gold w-full py-3.5 rounded-full font-semibold text-xs tracking-widest flex items-center justify-center gap-2 shadow-md uppercase"
               >
                 <MessageCircle className="w-4 h-4 text-[#E8C86B]" />
-                CHECKOUT VIA WHATSAPP
+                PROCEED TO CHECKOUT
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </button>
 
               <p className="text-[10px] text-[#8C6B4F] text-center leading-relaxed">
-                Direct WhatsApp ordering: You will be redirected with pre-filled saree order details.
+                You&apos;ll be asked for delivery details, then redirected to WhatsApp with a pre-filled order.
               </p>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Checkout / Address Capture Modal */}
+      <AnimatePresence>
+        {showCheckoutModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCheckoutModal(false)}
+              className="fixed inset-0 bg-[#38030B]/60 backdrop-blur-xs z-[60]"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 30 }}
+              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-md bg-[#FAF6EE] border-2 border-[#C59B27] rounded-lg z-[70] p-6 shadow-2xl font-serif max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#C59B27]">
+                <h2 className="font-serif text-lg font-bold text-[#6A091A] uppercase tracking-wider">
+                  DELIVERY DETAILS
+                </h2>
+                <button onClick={() => setShowCheckoutModal(false)} className="p-1 text-[#6A091A]">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <p className="text-xs font-sans text-[#7C6354] mb-4">
+                Provide your contact and delivery details. Your order will be recorded and you&apos;ll be redirected to WhatsApp for instant confirmation.
+              </p>
+
+              <div className="space-y-4 font-sans text-xs">
+                {/* Full Name */}
+                <div>
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-[#C59B27]" />
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={checkoutForm.name}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, name: e.target.value })}
+                    placeholder="e.g. Priya Sharma"
+                    className={`w-full px-4 py-2.5 rounded bg-[#FFFDF8] border text-sm text-[#241416] placeholder:text-[#7C6354] focus:outline-none ${
+                      formErrors.name ? 'border-red-400 focus:border-red-500' : 'border-[#C59B27]/40 focus:border-[#6A091A]'
+                    }`}
+                  />
+                  {formErrors.name && <p className="text-red-600 text-[11px] mt-1">{formErrors.name}</p>}
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-[#C59B27]" />
+                    Mobile Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={checkoutForm.phone}
+                    onChange={(e) => setCheckoutForm({ ...checkoutForm, phone: e.target.value })}
+                    placeholder="e.g. 9876543210"
+                    className={`w-full px-4 py-2.5 rounded bg-[#FFFDF8] border text-sm text-[#241416] placeholder:text-[#7C6354] focus:outline-none ${
+                      formErrors.phone ? 'border-red-400 focus:border-red-500' : 'border-[#C59B27]/40 focus:border-[#6A091A]'
+                    }`}
+                  />
+                  {formErrors.phone && <p className="text-red-600 text-[11px] mt-1">{formErrors.phone}</p>}
+                </div>
+
+                {/* City & Pincode */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-[#C59B27]" />
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={checkoutForm.city}
+                      onChange={(e) => setCheckoutForm({ ...checkoutForm, city: e.target.value })}
+                      placeholder="e.g. Hyderabad"
+                      className={`w-full px-3 py-2.5 rounded bg-[#FFFDF8] border text-sm text-[#241416] placeholder:text-[#7C6354] focus:outline-none ${
+                        formErrors.city ? 'border-red-400 focus:border-red-500' : 'border-[#C59B27]/40 focus:border-[#6A091A]'
+                      }`}
+                    />
+                    {formErrors.city && <p className="text-red-600 text-[11px] mt-1">{formErrors.city}</p>}
+                  </div>
+                  <div>
+                    <label className="font-serif font-bold text-[#7C6354] uppercase block mb-1">
+                      Pincode
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={checkoutForm.pincode}
+                      onChange={(e) => setCheckoutForm({ ...checkoutForm, pincode: e.target.value.replace(/\D/g, '') })}
+                      placeholder="e.g. 500001"
+                      className={`w-full px-3 py-2.5 rounded bg-[#FFFDF8] border text-sm text-[#241416] placeholder:text-[#7C6354] focus:outline-none ${
+                        formErrors.pincode ? 'border-red-400 focus:border-red-500' : 'border-[#C59B27]/40 focus:border-[#6A091A]'
+                      }`}
+                    />
+                    {formErrors.pincode && <p className="text-red-600 text-[11px] mt-1">{formErrors.pincode}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Summary in Modal */}
+              <div className="mt-5 p-3 rounded bg-[#FFFDF8] border border-[#C59B27]/40 text-xs font-sans">
+                <div className="flex justify-between text-[#8C6B4F]">
+                  <span>{totalItems} items</span>
+                  <span className="font-bold text-[#6A091A]">₹{totalPrice.toLocaleString('en-IN')}</span>
+                </div>
+                <div className="flex justify-between text-[#8C6B4F] mt-1">
+                  <span>Shipping</span>
+                  <span className="text-[#0D3B2E] font-bold">FREE</span>
+                </div>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                onClick={handleCheckoutSubmit}
+                disabled={checkoutLoading}
+                className="mt-5 btn-maroon-gold w-full py-3.5 rounded-full font-semibold text-xs tracking-widest flex items-center justify-center gap-2 shadow-md uppercase disabled:opacity-60"
+              >
+                {checkoutLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    PLACING ORDER...
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="w-4 h-4 text-[#E8C86B]" />
+                    PLACE ORDER & OPEN WHATSAPP
+                  </>
+                )}
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

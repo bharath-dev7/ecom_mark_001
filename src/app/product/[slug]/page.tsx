@@ -3,9 +3,10 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Check, Minus, Plus, MapPin, Sparkles, Package, Heart, ZoomIn, X, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Check, Minus, Plus, MapPin, Sparkles, Package, Heart, ZoomIn, X, ChevronDown, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
+import { useToast } from '@/components/Toast';
 import { getProductBySlug, getAllProducts } from '@/lib/productService';
 import { Product } from '@/lib/supabase';
 import { mockProducts } from '@/lib/mockData';
@@ -23,6 +24,8 @@ export default function ProductDetailPage() {
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'origin' | 'care' | 'artistry'>('origin');
   const addItem = useCartStore((s) => s.addItem);
+  const { addToast } = useToast();
+  const MAX_QUANTITY = 5; // Artisanal handloom pieces — limited availability
 
   useEffect(() => {
     async function loadProduct() {
@@ -71,6 +74,7 @@ export default function ProductDetailPage() {
     : 0;
 
   const handleAddToCart = () => {
+    if (!product.in_stock) return;
     for (let i = 0; i < quantity; i++) {
       addItem({
         id: product.id,
@@ -82,6 +86,11 @@ export default function ProductDetailPage() {
       });
     }
     setAdded(true);
+    addToast({
+      type: 'success',
+      title: 'Added to Royal Bag!',
+      message: `${quantity}× ${product.name} added.`,
+    });
     setTimeout(() => setAdded(false), 2000);
   };
 
@@ -91,8 +100,41 @@ export default function ProductDetailPage() {
 
   const mainImage = product.images[0] || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1200&q=85';
 
+  // JSON-LD Product Schema for Google Rich Snippets
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.images.length > 0 ? product.images : [mainImage],
+    description: product.description || `Premium ${product.fabric} saree in ${product.color}`,
+    brand: {
+      '@type': 'Brand',
+      name: 'ZEYANA',
+    },
+    offers: {
+      '@type': 'Offer',
+      url: typeof window !== 'undefined' ? window.location.href : '',
+      priceCurrency: 'INR',
+      price: product.price,
+      availability: product.in_stock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/SoldOut',
+      seller: {
+        '@type': 'Organization',
+        name: 'ZEYANA Sarees & More',
+      },
+    },
+    material: product.fabric,
+    color: product.color,
+  };
+
   return (
     <div className="bg-[#FAF6EE] min-h-screen text-[#241416]">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-[#C59B27]/40 text-xs font-serif tracking-wider uppercase">
         <div className="flex items-center gap-2 text-[#8C6B4F]">
@@ -206,6 +248,21 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
+            {/* Out of Stock Badge */}
+            {!product.in_stock && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 border border-red-200">
+                <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <div>
+                  <p className="font-serif text-sm font-bold text-red-800 uppercase tracking-wider">
+                    Sold to Royalty
+                  </p>
+                  <p className="text-xs font-sans text-red-600 mt-0.5">
+                    This exclusive piece has been acquired. Browse similar sarees below.
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Quantity + Add to Bag CTA */}
             {product.in_stock && (
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
@@ -220,8 +277,9 @@ export default function ProductDetailPage() {
                     {quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-7 h-7 flex items-center justify-center text-[#6A091A] hover:bg-[#6A091A] hover:text-[#E8C86B] rounded-full transition-colors"
+                    onClick={() => setQuantity(Math.min(MAX_QUANTITY, quantity + 1))}
+                    className="w-7 h-7 flex items-center justify-center text-[#6A091A] hover:bg-[#6A091A] hover:text-[#E8C86B] rounded-full transition-colors disabled:opacity-40"
+                    disabled={quantity >= MAX_QUANTITY}
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>

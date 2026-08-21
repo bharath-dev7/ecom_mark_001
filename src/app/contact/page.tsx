@@ -1,23 +1,87 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Phone, Mail, MapPin, MessageCircle, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, MessageCircle, Send, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { SectionDivider } from '@/components/OrnamentalIcons';
+import { useToast } from '@/components/Toast';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 export default function ContactPage() {
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     message: '',
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-    setFormData({ name: '', email: '', message: '' });
+
+    // Basic validation
+    if (!formData.name.trim() || formData.name.trim().length < 2) {
+      addToast({ type: 'warning', title: 'Name Required', message: 'Please enter your full name.' });
+      return;
+    }
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      addToast({ type: 'warning', title: 'Valid Email Required', message: 'Please enter a valid email address.' });
+      return;
+    }
+    if (!formData.message.trim() || formData.message.trim().length < 10) {
+      addToast({ type: 'warning', title: 'Message Too Short', message: 'Please describe your inquiry in at least 10 characters.' });
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      // 1. Persist to Supabase inquiries table (if configured)
+      if (isSupabaseConfigured()) {
+        const { error } = await supabase.from('inquiries').insert({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || null,
+          message: formData.message.trim(),
+        });
+
+        if (error) {
+          console.warn('Inquiry save warning:', error.message);
+          // Don't block — still show success and redirect to WhatsApp
+        }
+      }
+
+      // 2. Also dispatch to WhatsApp for instant boutique notification
+      const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919347365885';
+      const whatsappMessage = encodeURIComponent(
+        `❖ *NEW BOUTIQUE INQUIRY — ZEYANA* ❖\n\n` +
+        `👤 *Name:* ${formData.name.trim()}\n` +
+        `📧 *Email:* ${formData.email.trim()}\n` +
+        (formData.phone.trim() ? `📱 *Phone:* ${formData.phone.trim()}\n` : '') +
+        `\n💬 *Message:*\n${formData.message.trim()}`
+      );
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+
+      // 3. Show success
+      addToast({
+        type: 'success',
+        title: 'Inquiry Sent!',
+        message: 'Your message has been recorded. Opening WhatsApp for instant follow-up...',
+        duration: 5000,
+      });
+
+      setFormData({ name: '', email: '', phone: '', message: '' });
+
+      // 4. Open WhatsApp in new tab
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      }, 800);
+    } catch (err) {
+      addToast({ type: 'error', title: 'Submission Error', message: 'Something went wrong. Please try again.' });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const contactMethods = [
@@ -139,6 +203,18 @@ export default function ContactPage() {
               </div>
               <div>
                 <label className="text-xs font-serif font-bold text-[#7C6354] uppercase tracking-wider mb-1 block">
+                  Phone (Optional)
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="e.g. 9876543210"
+                  className="w-full px-4 py-2.5 rounded bg-[#FAF6EE] border border-[#C59B27]/40 text-sm text-[#241416] placeholder:text-[#7C6354] focus:border-[#6A091A] focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-serif font-bold text-[#7C6354] uppercase tracking-wider mb-1 block">
                   Message / Custom Weave Inquiry
                 </label>
                 <textarea
@@ -152,11 +228,14 @@ export default function ContactPage() {
               </div>
               <button
                 type="submit"
-                disabled={submitted}
-                className="btn-maroon-gold w-full py-3 rounded-full font-serif font-bold text-xs tracking-widest flex items-center justify-center gap-2 uppercase shadow-md"
+                disabled={submitting}
+                className="btn-maroon-gold w-full py-3 rounded-full font-serif font-bold text-xs tracking-widest flex items-center justify-center gap-2 uppercase shadow-md disabled:opacity-60"
               >
-                {submitted ? (
-                  'MESSAGE DISPATCHED!'
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    SENDING...
+                  </>
                 ) : (
                   <>
                     <Send className="w-4 h-4 text-[#E8C86B]" />
