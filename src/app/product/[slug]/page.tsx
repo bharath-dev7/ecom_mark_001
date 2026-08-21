@@ -4,21 +4,50 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Check, Minus, Plus, MapPin, Sparkles, Package, Heart, ZoomIn, X, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/cartStore';
-import { getProductBySlug, mockProducts } from '@/lib/mockData';
+import { getProductBySlug, getAllProducts } from '@/lib/productService';
+import { Product } from '@/lib/supabase';
+import { mockProducts } from '@/lib/mockData';
 import ProductCard from '@/components/ProductCard';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const product = getProductBySlug(slug);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>(mockProducts);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [liked, setLiked] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'origin' | 'care' | 'artistry'>('origin');
   const addItem = useCartStore((s) => s.addItem);
+
+  useEffect(() => {
+    async function loadProduct() {
+      setLoading(true);
+      const [fetchedProduct, catalog] = await Promise.all([
+        getProductBySlug(slug),
+        getAllProducts(),
+      ]);
+      setProduct(fetchedProduct);
+      setAllProducts(catalog);
+      setLoading(false);
+    }
+    if (slug) {
+      loadProduct();
+    }
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 bg-[#FAF6EE] font-serif py-16">
+        <div className="w-8 h-8 border-2 border-[#6A091A] border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p className="font-serif text-sm text-[#7C6354]">Loading weave specification...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -56,7 +85,7 @@ export default function ProductDetailPage() {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const related = mockProducts
+  const related = allProducts
     .filter((p) => p.id !== product.id && (p.fabric === product.fabric || p.occasion === product.occasion))
     .slice(0, 4);
 

@@ -3,16 +3,16 @@ import { CartItem } from '@/store/cartStore';
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919347365885';
 
 export function formatCartForWhatsApp(items: CartItem[], total: number): string {
-  const header = '🛍️ *New Order from Saree Store*\n\n';
+  const header = '❖ *NEW ROYAL ORDER — ZEYANA SAREES* ❖\n\n';
 
   const itemLines = items
     .map(
       (item, i) =>
-        `${i + 1}. *${item.name}*\n   Fabric: ${item.fabric}\n   Qty: ${item.quantity}\n   Price: ₹${item.price.toLocaleString('en-IN')} × ${item.quantity} = ₹${(item.price * item.quantity).toLocaleString('en-IN')}`
+        `${i + 1}. *${item.name}*\n   Weave / Fabric: ${item.fabric}\n   Quantity: ${item.quantity}\n   Price: ₹${item.price.toLocaleString('en-IN')} × ${item.quantity} = ₹${(item.price * item.quantity).toLocaleString('en-IN')}`
     )
     .join('\n\n');
 
-  const footer = `\n\n---\n💰 *Total: ₹${total.toLocaleString('en-IN')}*\n\nPlease confirm the order and share payment details. 🙏`;
+  const footer = `\n\n-------------------------------\n💰 *TOTAL AMOUNT: ₹${total.toLocaleString('en-IN')}*\n\nKindly confirm availability and share payment/delivery steps. Thank you! 🙏`;
 
   return header + itemLines + footer;
 }

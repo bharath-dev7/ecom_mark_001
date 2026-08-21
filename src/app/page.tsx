@@ -1,14 +1,25 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Heart } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { categoriesData, mockProducts } from '@/lib/mockData';
+import { getAllProducts } from '@/lib/productService';
+import { Product } from '@/lib/supabase';
 import { SectionDivider, RoyalElephant, FestiveEmblemBadge } from '@/components/OrnamentalIcons';
 
 export default function HomePage() {
-  const featured = mockProducts;
+  const [featured, setFeatured] = useState<Product[]>(mockProducts);
+
+  useEffect(() => {
+    async function loadFeatured() {
+      const data = await getAllProducts();
+      setFeatured(data);
+    }
+    loadFeatured();
+  }, []);
 
   return (
     <div className="bg-[#FAF6EE] text-[#241416] font-serif">

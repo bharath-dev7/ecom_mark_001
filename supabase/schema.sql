@@ -1,6 +1,6 @@
 -- ============================================================
--- Saree Catalog – Supabase Schema
--- Run this in the Supabase SQL Editor to set up your database.
+-- ZEYANA Saree Boutique – Supabase Database Schema
+-- Run this in your Supabase SQL Editor (https://app.supabase.com)
 -- ============================================================
 
 -- 1. Products Table
@@ -21,32 +21,52 @@ CREATE TABLE IF NOT EXISTS products (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Indexes
+-- 2. Orders Table (For tracking WhatsApp & Boutique orders)
+CREATE TABLE IF NOT EXISTS orders (
+  id            UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_name TEXT,
+  phone         TEXT,
+  total_amount  NUMERIC(10,2) NOT NULL,
+  items         JSONB NOT NULL DEFAULT '[]'::jsonb,
+  status        TEXT NOT NULL DEFAULT 'Pending',
+  created_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Indexes for Speed
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_fabric ON products(fabric);
 CREATE INDEX IF NOT EXISTS idx_products_occasion ON products(occasion);
 CREATE INDEX IF NOT EXISTS idx_products_featured ON products(featured);
+CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at DESC);
 
--- 3. Enable Row Level Security
+-- 4. Enable Row Level Security (RLS)
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
--- Allow anyone to read products
-CREATE POLICY "Allow public read" ON products
+-- Products Policies
+CREATE POLICY "Allow public read products" ON products
   FOR SELECT USING (true);
 
--- Allow authenticated users (admins) to insert
-CREATE POLICY "Allow authenticated insert" ON products
+CREATE POLICY "Allow authenticated insert products" ON products
   FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
--- Allow authenticated users (admins) to update
-CREATE POLICY "Allow authenticated update" ON products
+CREATE POLICY "Allow authenticated update products" ON products
   FOR UPDATE USING (auth.role() = 'authenticated');
 
--- Allow authenticated users (admins) to delete
-CREATE POLICY "Allow authenticated delete" ON products
+CREATE POLICY "Allow authenticated delete products" ON products
   FOR DELETE USING (auth.role() = 'authenticated');
 
--- 4. Storage Bucket (run in Supabase Dashboard > Storage > Create new bucket)
--- Name: saree-images
--- Public: Yes
--- Allowed MIME types: image/jpeg, image/png, image/webp
+-- Orders Policies
+CREATE POLICY "Allow public insert orders" ON orders
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated read orders" ON orders
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+-- 5. Default Sample Seed Data
+INSERT INTO products (name, slug, price, mrp, fabric, color, occasion, region, description, images, featured)
+VALUES
+('Royal Banarasi Silk Saree', 'royal-banarasi-silk-saree', 3499.00, 5999.00, 'Pure Silk', 'Red & Gold', 'Wedding & Festive', 'Varanasi', 'Opulent Royal Banarasi silk saree woven with golden zari brocade motifs across rich crimson red silk.', ARRAY['https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80'], true),
+('Mehendi Green Kanjivaram Saree', 'mehendi-green-kanjivaram-saree', 4299.00, 6999.00, 'Kanjivaram Silk', 'Mehendi Green', 'Wedding', 'Kanchipuram', 'Authentic Kanchipuram silk saree in mehendi green featuring contrasting crimson pallu and heavy gold thread weaving.', ARRAY['https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80'], true),
+('Peach Gold Tissue Saree', 'peach-gold-tissue-saree', 2699.00, 4499.00, 'Tissue Silk', 'Peach Gold', 'Festive', 'Chanderi', 'Luminous peach gold tissue silk saree with shimmering golden sheen and delicate hand-carved golden pallu flourishes.', ARRAY['https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80'], true)
+ON CONFLICT (slug) DO NOTHING;

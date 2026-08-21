@@ -6,7 +6,7 @@ export function getSupabase(): SupabaseClient {
   if (!_supabase) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-    if (!supabaseUrl) {
+    if (!supabaseUrl || (!supabaseUrl.startsWith('http://') && !supabaseUrl.startsWith('https://'))) {
       // Return a dummy client that won't be used — caller should check isConfigured()
       return createClient('https://placeholder.supabase.co', 'placeholder');
     }
@@ -17,7 +17,7 @@ export function getSupabase(): SupabaseClient {
 
 export function isSupabaseConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return !!url && url.length > 0;
+  return !!url && (url.startsWith('http://') || url.startsWith('https://'));
 }
 
 export const supabase = new Proxy({} as SupabaseClient, {

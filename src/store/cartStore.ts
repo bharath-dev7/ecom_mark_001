@@ -23,12 +23,30 @@ interface CartState {
   getTotalPrice: () => number;
 }
 
+const FALLBACK_CART_IMAGE = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80';
+
+/**
+ * Truncates base64 data URLs to prevent browser LocalStorage QuotaExceededError
+ */
+function sanitizeCartImage(url?: string): string {
+  if (!url) return FALLBACK_CART_IMAGE;
+  // If image URL is a base64 Data URL or exceeds 1KB length, use fallback/compressed reference
+  if (url.startsWith('data:') || url.length > 1024) {
+    return FALLBACK_CART_IMAGE;
+  }
+  return url;
+}
+
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
 
-      addItem: (item) => {
+      addItem: (rawItem) => {
+        const item = {
+          ...rawItem,
+          image: sanitizeCartImage(rawItem.image),
+        };
         const existing = get().items.find((i) => i.id === item.id);
         if (existing) {
           set({

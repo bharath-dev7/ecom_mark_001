@@ -52,6 +52,13 @@ export default function ProductCard({ product }: ProductCardProps) {
             <img
               src={product.images[0] || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80'}
               alt={product.name}
+              loading="lazy"
+              decoding="async"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80';
+              }}
               className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
             />
 

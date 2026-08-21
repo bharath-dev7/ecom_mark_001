@@ -213,7 +213,17 @@ export default function Navbar() {
                     >
                       <div className="w-20 h-24 rounded bg-[#F3EDE0] overflow-hidden flex-shrink-0 border border-[#C59B27]/30">
                         {item.image ? (
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.onerror = null;
+                              target.src = 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80';
+                            }}
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <div className="w-full h-full bg-[#6A091A]/10 flex items-center justify-center text-2xl">
                             🥻

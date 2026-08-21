@@ -1,30 +1,43 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import FilterSidebar from '@/components/FilterSidebar';
 import { SectionDivider } from '@/components/OrnamentalIcons';
-import {
-  mockProducts,
-  getUniqueFabrics,
-  getUniqueColors,
-  getUniqueOccasions,
-} from '@/lib/mockData';
+import { getAllProducts } from '@/lib/productService';
+import { Product } from '@/lib/supabase';
+import { mockProducts } from '@/lib/mockData';
 
 export default function ShopPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [selectedFabrics, setSelectedFabrics] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string>('featured');
-  const maxPrice = Math.max(...mockProducts.map((p) => p.price));
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
 
-  const fabrics = getUniqueFabrics();
-  const colors = getUniqueColors();
-  const occasions = getUniqueOccasions();
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      const data = await getAllProducts();
+      setProducts(data);
+      if (data.length > 0) {
+        const max = Math.max(...data.map((p) => p.price));
+        setPriceRange([0, max]);
+      }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  const fabrics = useMemo(() => Array.from(new Set(products.map((p) => p.fabric))), [products]);
+  const colors = useMemo(() => Array.from(new Set(products.map((p) => p.color))), [products]);
+  const occasions = useMemo(() => Array.from(new Set(products.map((p) => p.occasion))), [products]);
+  const maxPrice = useMemo(() => (products.length > 0 ? Math.max(...products.map((p) => p.price)) : 20000), [products]);
 
   const toggleFilter = (
     value: string,
@@ -39,7 +52,7 @@ export default function ShopPage() {
   };
 
   const filteredProducts = useMemo(() => {
-    let result = mockProducts;
+    let result = products;
 
     // Search
     if (search) {
@@ -87,7 +100,7 @@ export default function ShopPage() {
     }
 
     return result;
-  }, [search, selectedFabrics, selectedColors, selectedOccasions, priceRange, sortBy]);
+  }, [products, search, selectedFabrics, selectedColors, selectedOccasions, priceRange, sortBy]);
 
   const clearAll = () => {
     setSelectedFabrics([]);
@@ -104,7 +117,7 @@ export default function ShopPage() {
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <SectionDivider title="ROYAL BOUTIQUE CATALOG" />
           <p className="text-xs sm:text-sm font-sans tracking-[0.2em] text-[#E8C86B] uppercase mt-2">
-            EXPLORE {mockProducts.length} HANDWOVEN SAREES & LEHENGAS
+            EXPLORE {products.length} HANDWOVEN SAREES & LEHENGAS
           </p>
         </div>
       </section>
@@ -179,7 +192,12 @@ export default function ShopPage() {
 
           {/* Products Grid */}
           <div className="flex-1">
-            {filteredProducts.length === 0 ? (
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 bg-[#FFFDF8] rounded-lg border border-[#E2D7C3]">
+                <Loader2 className="w-8 h-8 text-[#6A091A] animate-spin mb-3" />
+                <p className="font-serif text-sm text-[#7C6354]">Curating boutique catalog...</p>
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="text-center py-20 bg-[#FFFDF8] rounded-lg border border-[#E2D7C3] p-8">
                 <span className="text-5xl block mb-4">🥻</span>
                 <h3 className="font-serif text-2xl font-semibold text-[#6A091A] mb-2">
@@ -199,7 +217,7 @@ export default function ShopPage() {
               <>
                 <div className="flex justify-between items-center mb-6 border-b border-[#C59B27]/30 pb-2">
                   <span className="text-xs font-serif tracking-wider uppercase text-[#7C6354]">
-                    SHOWING {filteredProducts.length} OF {mockProducts.length} SAREES
+                    SHOWING {filteredProducts.length} OF {products.length} SAREES
                   </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
